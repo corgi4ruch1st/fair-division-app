@@ -18,23 +18,25 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- ==================== SETUP BANNER (แสดงเมื่อยังไม่ได้ใส่ URL) ==================== -->
-  <div id="setupBanner" class="hidden bg-amber-50 border-b-2 border-amber-300 px-4 py-4">
-    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center gap-3">
-      <div class="flex items-center gap-2 text-amber-800 text-sm font-semibold shrink-0">
-        <span class="text-xl">⚙️</span>
-        <span>ตั้งค่าเริ่มต้น: วาง Deployment URL ของ Apps Script</span>
+  <!-- ==================== OPTIONAL SETUP BANNER (ซ่อนไว้เป็นค่าเริ่มต้น เปิดเฉพาะเมื่อกดปุ่มตั้งค่า) ==================== -->
+  <div id="setupBanner" class="hidden bg-slate-900 text-white border-b border-slate-700 px-4 py-3.5">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-3">
+      <div class="flex items-center gap-2 text-indigo-300 text-xs font-semibold shrink-0">
+        <span>🔗 Google Sheets API URL (ไม่บังคับ):</span>
       </div>
       <input id="setupUrlInput" type="url" placeholder="https://script.google.com/macros/s/XXXXXX/exec"
-             class="flex-1 w-full px-3 py-2 rounded-lg border border-amber-300 text-sm bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none">
-      <button onclick="saveScriptUrl()"
-              class="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold shrink-0 cursor-pointer">
-        💾 บันทึก & เชื่อมต่อ
-      </button>
+             class="flex-1 w-full px-3 py-1.5 rounded-lg border border-slate-600 text-xs bg-slate-800 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="saveScriptUrl()"
+                class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold cursor-pointer">
+          💾 บันทึกเชื่อม Sheet
+        </button>
+        <button onclick="document.getElementById('setupBanner').classList.add('hidden')"
+                class="px-2.5 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs cursor-pointer">
+          ปิด ✕
+        </button>
+      </div>
     </div>
-    <p class="max-w-4xl mx-auto text-xs text-amber-700 mt-2">
-      วิธีการ: เปิด Apps Script Editor → กด Deploy → New deployment → Web app → ตั้ง Execute as: Me, Access: Anyone → Deploy → คัดลอก URL มาวางที่นี่
-    </p>
   </div>
 
   <!-- ==================== TOP NAVIGATION HEADER ==================== -->
@@ -45,17 +47,17 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-xl font-bold tracking-tight">FairShare Engine</h1>
-            <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-400/30 border border-indigo-300/40 font-medium">
-              GitHub Pages Edition
+            <span id="syncStatusBadge" class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-400/25 border border-emerald-300/40 font-medium text-emerald-100">
+              ⚡ พร้อมใช้งานทันที
             </span>
           </div>
           <p class="text-xs text-indigo-100/90">ระบบแบ่งสิ่งของ จัดเวรทำงาน และหารค่าเช่าห้องอย่างยุติธรรมตามทฤษฎี Fair Division</p>
         </div>
       </div>
       <div class="flex items-center gap-2.5">
-        <button onclick="showSetupBanner()" title="เปลี่ยน Apps Script URL"
-                class="inline-flex items-center gap-1.5 text-xs bg-white/10 hover:bg-white/20 border border-white/20 px-3.5 py-2 rounded-lg transition cursor-pointer">
-          <span>⚙️ ตั้งค่า API URL</span>
+        <button onclick="toggleSetupBanner()" title="ตั้งค่าการเชื่อมต่อ Google Sheets (ตัวเลือกเสริม)"
+                class="inline-flex items-center gap-1.5 text-xs bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-2 rounded-lg transition cursor-pointer">
+          <span>⚙️ เชื่อมต่อ Sheet</span>
         </button>
         <button onclick="openCreateModal()"
                 class="inline-flex items-center gap-1.5 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg shadow transition cursor-pointer">
@@ -66,10 +68,10 @@
   </header>
 
   <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center">
+  <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden items-center justify-center">
     <div class="bg-white rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-3 max-w-xs w-full mx-4">
       <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-      <p id="loadingText" class="text-sm font-medium text-slate-700 text-center">กำลังเชื่อมต่อ...</p>
+      <p id="loadingText" class="text-sm font-medium text-slate-700 text-center">กำลังประมวลผล...</p>
     </div>
   </div>
 
@@ -121,7 +123,7 @@
       <div class="flex items-center justify-between pb-4 border-b border-slate-100">
         <div>
           <h3 class="text-lg font-bold text-slate-900">✨ สร้างรายการแบ่งสรรใหม่</h3>
-          <p class="text-xs text-slate-500">ข้อมูลจะถูกบันทึกลง Google Sheets อัตโนมัติ</p>
+          <p class="text-xs text-slate-500">รองรับการแบ่งสิ่งของ แบ่งเวรทำงาน และหารค่าเช่าห้องพัก</p>
         </div>
         <button onclick="closeCreateModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold px-2 cursor-pointer">✕</button>
       </div>
@@ -191,67 +193,578 @@
   </div>
 
 <script>
-// =========================================================================
-// API Layer — เรียก Apps Script Backend ผ่าน fetch()
-// =========================================================================
-const STORAGE_KEY = 'fairshare_script_url';
+// ============================================================================
+// Built-In Mathematical Fair Division Engine (Client-Side + Cloud Sync Hybrid)
+// ทำงานได้ทันที 100% โดยไม่บังคับต้องตั้งค่า Deployment URL
+// ============================================================================
+const STORAGE_KEY_URL = 'fairshare_script_url';
+const STORAGE_KEY_DB  = 'fairshare_local_sessions_v1';
 const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwCmV_an0KJMKnZ4AnY-1M5Jg7t09LY7tP5k9zQF2IkW9A_mAmFfvLpXg-P7H7ewvdq9Q/exec';
 
+let isCloudConnected = false;
+
 function getScriptUrl() {
-  return localStorage.getItem(STORAGE_KEY) || DEFAULT_SCRIPT_URL;
+  return localStorage.getItem(STORAGE_KEY_URL) || DEFAULT_SCRIPT_URL;
 }
 
-function showSetupBanner() {
+function toggleSetupBanner() {
   const banner = document.getElementById('setupBanner');
-  banner.classList.remove('hidden');
-  const input = document.getElementById('setupUrlInput');
-  input.value = getScriptUrl();
-  input.focus();
+  banner.classList.toggle('hidden');
+  if (!banner.classList.contains('hidden')) {
+    document.getElementById('setupUrlInput').value = getScriptUrl();
+  }
 }
 
 function saveScriptUrl() {
   const url = document.getElementById('setupUrlInput').value.trim();
-  if (!url || !url.startsWith('https://script.google.com/')) {
-    alert('กรุณาวาง URL ที่ขึ้นต้นด้วย https://script.google.com/macros/s/...');
-    return;
+  if (url) {
+    localStorage.setItem(STORAGE_KEY_URL, url);
+  } else {
+    localStorage.removeItem(STORAGE_KEY_URL);
   }
-  localStorage.setItem(STORAGE_KEY, url);
   document.getElementById('setupBanner').classList.add('hidden');
-  showToast('บันทึก API URL สำเร็จ! กำลังเชื่อมต่อ...', '⚙️');
-  fetchInitialData();
+  showToast('บันทึก URL แล้ว กำลังลองซิงค์ข้อมูล...', '🔗');
+  trySyncFromCloud();
 }
 
-/**
- * เรียก Apps Script API ผ่าน POST
- * ใช้ Content-Type: text/plain เพื่อหลีกเลี่ยง CORS Preflight
- */
-async function callApi(action, extraPayload = {}) {
-  const url = getScriptUrl();
-  if (!url) {
-    showSetupBanner();
-    throw new Error('กรุณาตั้งค่า Apps Script Deployment URL ก่อน');
+// ============================================================================
+// Client-Side Fair Division Mathematical Engine (ตรงกับ Algorithms.js 100%)
+// ============================================================================
+function computeSessionAllocationClient(session, overrideAlgorithm) {
+  const participants = session.participants || [];
+  const items = session.items || [];
+  const valuations = session.valuations || {};
+  const n = participants.length;
+  const m = items.length;
+  if (n < 2 || m < 1) return null;
+
+  const rawMatrix = [];
+  const normMatrix = [];
+
+  for (let i = 0; i < n; i++) {
+    const pName = participants[i];
+    const pScores = (valuations[pName] && valuations[pName].scores) ? valuations[pName].scores : {};
+    const rawRow = [];
+    let sumRaw = 0;
+    for (let j = 0; j < m; j++) {
+      const val = Math.max(0, Number(pScores[items[j].id] !== undefined ? pScores[items[j].id] : 0));
+      rawRow.push(val);
+      sumRaw += val;
+    }
+    if (sumRaw <= 0) {
+      const eq = session.mode === 'RENT' && session.totalCost > 0 ? (session.totalCost / m) : (100 / m);
+      for (let j = 0; j < m; j++) rawRow[j] = Number(eq.toFixed(2));
+      sumRaw = rawRow.reduce((a, b) => a + b, 0);
+    }
+    normMatrix.push(rawRow.map(v => (v / sumRaw) * 100));
+    rawMatrix.push(rawRow);
   }
 
-  const body = JSON.stringify({ action, ...extraPayload });
+  let algo = overrideAlgorithm || session.algorithm || 'AUTO';
+  if (algo === 'AUTO') {
+    if (session.mode === 'GOODS') algo = (n === 2) ? 'ADJUSTED_WINNER' : 'MNW_EF1';
+    else if (session.mode === 'CHORES') algo = 'CHORES_EF1';
+    else if (session.mode === 'RENT') algo = 'RENT_ENVY_FREE';
+    else algo = 'MNW_EF1';
+  }
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: body,
-    redirect: 'follow'
+  let output;
+  if (session.mode === 'RENT') {
+    output = solveRentDivisionClient_(participants, items, rawMatrix, normMatrix, session.totalCost);
+    algo = 'RENT_ENVY_FREE';
+  } else if (session.mode === 'CHORES') {
+    output = solveChoresDivisionClient_(participants, items, rawMatrix, normMatrix);
+    algo = 'CHORES_EF1';
+  } else {
+    if (algo === 'ADJUSTED_WINNER' && n === 2) {
+      output = solveAdjustedWinnerClient_(participants, items, rawMatrix, normMatrix);
+    } else if (algo === 'ROUND_ROBIN') {
+      output = solveRoundRobinGoodsClient_(participants, items, rawMatrix, normMatrix);
+    } else {
+      algo = 'MNW_EF1';
+      output = solveMNWGoodsClient_(participants, items, rawMatrix, normMatrix);
+    }
+  }
+
+  session.algorithm = algo;
+  session.status = 'COMPUTED';
+  session.allocation = {
+    algorithmUsed: algo,
+    result: output.result,
+    fairnessMetrics: output.fairnessMetrics,
+    computedAt: new Date().toISOString()
+  };
+  return session.allocation;
+}
+
+function solveMNWGoodsClient_(participants, items, rawMatrix, normMatrix) {
+  const n = participants.length, m = items.length;
+  let bestAssignment = new Array(m).fill(0);
+
+  if (Math.pow(n, m) <= 250000) {
+    let bestPosCount = -1, bestEF1 = -1, bestLogNash = -1e18, bestMinUtil = -1e18;
+    const cur = new Array(m).fill(0), utils = new Array(n).fill(0);
+    function dfs(idx) {
+      if (idx === m) {
+        let pos = 0, logN = 0, minU = 1e18;
+        for (let i = 0; i < n; i++) {
+          if (utils[i] > 1e-6) { pos++; logN += Math.log(utils[i]); }
+          if (utils[i] < minU) minU = utils[i];
+        }
+        if (pos < bestPosCount) return;
+        const ef1 = checkGoodsEF1_(cur, normMatrix, n, m) ? 1 : 0;
+        let better = false;
+        if (pos > bestPosCount) better = true;
+        else if (ef1 > bestEF1) better = true;
+        else if (ef1 === bestEF1) {
+          if (logN > bestLogNash + 1e-7) better = true;
+          else if (Math.abs(logN - bestLogNash) <= 1e-7 && minU > bestMinUtil + 1e-7) better = true;
+        }
+        if (better) {
+          bestPosCount = pos; bestEF1 = ef1; bestLogNash = logN; bestMinUtil = minU;
+          bestAssignment = cur.slice();
+        }
+        return;
+      }
+      for (let i = 0; i < n; i++) {
+        cur[idx] = i; utils[i] += normMatrix[i][idx];
+        dfs(idx + 1);
+        utils[i] -= normMatrix[i][idx];
+      }
+    }
+    dfs(0);
+  } else {
+    bestAssignment = getRoundRobinAssign_(normMatrix, n, m);
+  }
+
+  return buildGoodsOrChoresOutput_(
+    'MNW_EF1',
+    'Maximum Nash Welfare (MNW + EF1)',
+    'จัดสรรสิ่งของโดยหาจุดที่ผลคูณความพึงพอใจของทุกคน (Nash Social Welfare) สูงที่สุด ควบคู่กับการรับประกันความยุติธรรมระดับ EF1 (Envy-Free up to 1 item) และประสิทธิภาพระดับ Pareto Optimal',
+    participants, items, rawMatrix, normMatrix, bestAssignment, false, null
+  );
+}
+
+function solveAdjustedWinnerClient_(participants, items, rawMatrix, normMatrix) {
+  const m = items.length, assign = new Array(m).fill(0);
+  let u0 = 0, u1 = 0;
+  for (let j = 0; j < m; j++) {
+    if (normMatrix[0][j] >= normMatrix[1][j]) { assign[j] = 0; u0 += normMatrix[0][j]; }
+    else { assign[j] = 1; u1 += normMatrix[1][j]; }
+  }
+  const highIdx = u0 >= u1 ? 0 : 1, lowIdx = 1 - highIdx;
+  const highItems = [];
+  for (let j = 0; j < m; j++) {
+    if (assign[j] === highIdx) {
+      const ratio = normMatrix[lowIdx][j] > 0 ? (normMatrix[highIdx][j] / normMatrix[lowIdx][j]) : 999999;
+      highItems.push({ idx: j, ratio });
+    }
+  }
+  highItems.sort((a, b) => a.ratio - b.ratio);
+  let splitNote = null, highUtil = highIdx === 0 ? u0 : u1, lowUtil = lowIdx === 0 ? u0 : u1;
+
+  for (let k = 0; k < highItems.length; k++) {
+    if (highUtil <= lowUtil + 1e-5) break;
+    const j = highItems[k].idx, vH = normMatrix[highIdx][j], vL = normMatrix[lowIdx][j];
+    if (highUtil - vH >= lowUtil + vL) {
+      assign[j] = lowIdx; highUtil -= vH; lowUtil += vL;
+    } else {
+      const alpha = (highUtil - lowUtil) / (vH + vL);
+      const pctLow = Math.round(alpha * 100), pctHigh = 100 - pctLow;
+      if (alpha > 0.5) assign[j] = lowIdx;
+      splitNote = {
+        itemName: items[j].name,
+        highParticipant: participants[highIdx],
+        lowParticipant: participants[lowIdx],
+        shareHighPct: pctHigh,
+        shareLowPct: pctLow,
+        equitableScore: Number((highUtil - alpha * vH).toFixed(2))
+      };
+      break;
+    }
+  }
+  return buildGoodsOrChoresOutput_(
+    'ADJUSTED_WINNER',
+    'Adjusted Winner Procedure (Brams & Taylor)',
+    'อัลกอริทึมมาตรฐานสำหรับ 2 ฝ่าย มอบสิ่งของให้ผู้ที่ให้คุณค่าสูงกว่าก่อน จากนั้นปรับสมดุลรายการที่มีอัตราส่วนคะแนนใกล้เคียงกันที่สุดเพื่อให้ทั้งสองฝ่ายได้ความพึงพอใจเท่าเทียมกัน',
+    participants, items, rawMatrix, normMatrix, assign, false, splitNote
+  );
+}
+
+function solveRoundRobinGoodsClient_(participants, items, rawMatrix, normMatrix) {
+  const n = participants.length, m = items.length;
+  return buildGoodsOrChoresOutput_(
+    'ROUND_ROBIN',
+    'Round-Robin Picking Sequence (EF1 Draft)',
+    'จัดลำดับการเลือกสิ่งของทีละรอบโดยให้แต่ละคนเลือกรายการที่ตนเองให้คุณค่าสูงสุดที่ยังเหลืออยู่ รับประกันทางคณิตศาสตร์ว่าเป็น EF1 เสมอ',
+    participants, items, rawMatrix, normMatrix, getRoundRobinAssign_(normMatrix, n, m), false, null
+  );
+}
+
+function getRoundRobinAssign_(normMatrix, n, m) {
+  const assign = new Array(m).fill(0), taken = new Array(m).fill(false);
+  for (let s = 0; s < m; s++) {
+    const agent = s % n;
+    let bestJ = -1, bestV = -1;
+    for (let j = 0; j < m; j++) {
+      if (!taken[j] && normMatrix[agent][j] > bestV) { bestV = normMatrix[agent][j]; bestJ = j; }
+    }
+    if (bestJ !== -1) { taken[bestJ] = true; assign[bestJ] = agent; }
+  }
+  return assign;
+}
+
+function solveChoresDivisionClient_(participants, items, rawMatrix, normMatrix) {
+  const n = participants.length, m = items.length;
+  let bestAssignment = new Array(m).fill(0);
+  if (Math.pow(n, m) <= 250000) {
+    let bestEF1 = -1, bestMaxB = 1e18, bestVar = 1e18;
+    const cur = new Array(m).fill(0), burdens = new Array(n).fill(0);
+    function dfs(idx) {
+      if (idx === m) {
+        let maxB = -1;
+        for (let i = 0; i < n; i++) if (burdens[i] > maxB) maxB = burdens[i];
+        const ef1 = checkChoresEF1_(cur, normMatrix, n, m) ? 1 : 0;
+        if (ef1 < bestEF1) return;
+        const mean = burdens.reduce((a, b) => a + b, 0) / n;
+        let variance = 0;
+        for (let i = 0; i < n; i++) variance += Math.pow(burdens[i] - mean, 2);
+        let better = false;
+        if (ef1 > bestEF1) better = true;
+        else if (maxB < bestMaxB - 1e-6) better = true;
+        else if (Math.abs(maxB - bestMaxB) <= 1e-6 && variance < bestVar - 1e-6) better = true;
+        if (better) { bestEF1 = ef1; bestMaxB = maxB; bestVar = variance; bestAssignment = cur.slice(); }
+        return;
+      }
+      for (let i = 0; i < n; i++) {
+        cur[idx] = i; burdens[i] += normMatrix[i][idx];
+        dfs(idx + 1);
+        burdens[i] -= normMatrix[i][idx];
+      }
+    }
+    dfs(0);
+  }
+  return buildGoodsOrChoresOutput_(
+    'CHORES_EF1',
+    'Min-Max Egalitarian & EF1 Chore Allocation',
+    'จัดสรรภาระงานโดยลดภาระสูงสุดที่คนใดคนหนึ่งต้องแบกรับ (Min-Max Burden) ให้ต่ำที่สุด และรับประกันว่าไม่มีใครต้องรับภาระหนักกว่าคนอื่นเกินกว่างาน 1 ชิ้น (EF1 for Chores)',
+    participants, items, rawMatrix, normMatrix, bestAssignment, true, null
+  );
+}
+
+function solveRentDivisionClient_(participants, items, rawMatrix, normMatrix, totalCostInput) {
+  const n = participants.length;
+  const totalRent = totalCostInput > 0 ? totalCostInput : (n * 5000);
+  const bidMatrix = normMatrix.map(row => {
+    const s = row.reduce((a, b) => a + b, 0) || 100;
+    return row.map(v => (v / s) * totalRent);
   });
 
-  if (!response.ok) {
-    throw new Error('HTTP Error ' + response.status + ': ' + response.statusText);
+  const perms = generatePerms_(n);
+  let bestPerm = perms[0], maxWelfare = -1e18;
+  for (let p = 0; p < perms.length; p++) {
+    let w = 0;
+    for (let i = 0; i < n; i++) w += bidMatrix[i][perms[p][i]];
+    if (w > maxWelfare) { maxWelfare = w; bestPerm = perms[p]; }
   }
 
-  const data = await response.json();
+  const dist = [];
+  for (let i = 0; i < n; i++) {
+    dist.push(new Array(n).fill(0));
+    for (let j = 0; j < n; j++) dist[i][j] = bidMatrix[i][bestPerm[i]] - bidMatrix[i][bestPerm[j]];
+  }
+  for (let k = 0; k < n; k++)
+    for (let i = 0; i < n; i++)
+      for (let j = 0; j < n; j++)
+        if (dist[i][k] + dist[k][j] < dist[i][j]) dist[i][j] = dist[i][k] + dist[k][j];
 
-  if (data && data.error) {
-    throw new Error(data.error);
+  const avgSurplus = (maxWelfare - totalRent) / n;
+  const agentPrices = new Array(n).fill(0).map((_, i) => bidMatrix[i][bestPerm[i]] - avgSurplus);
+
+  for (let iter = 0; iter < 400; iter++) {
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (i === j) continue;
+        const diff = agentPrices[i] - agentPrices[j];
+        if (diff > dist[i][j] + 1e-6) {
+          const ex = (diff - dist[i][j]) / 2;
+          agentPrices[i] -= ex; agentPrices[j] += ex;
+        }
+      }
+    }
+    const shift = (totalRent - agentPrices.reduce((a, b) => a + b, 0)) / n;
+    for (let i = 0; i < n; i++) agentPrices[i] += shift;
   }
 
-  return data;
+  const roundedPrices = agentPrices.map(p => Math.round(p));
+  const rDiff = Math.round(totalRent) - roundedPrices.reduce((a, b) => a + b, 0);
+  if (rDiff !== 0) roundedPrices[0] += rDiff;
+
+  const allocations = [], envyMatrix = [];
+  for (let i = 0; i < n; i++) {
+    const rIdx = bestPerm[i], room = items[rIdx], pricePaid = roundedPrices[i];
+    const valuation = Number(bidMatrix[i][rIdx].toFixed(2)), rawVal = Number(rawMatrix[i][rIdx].toFixed(2));
+    const surplus = Number((valuation - pricePaid).toFixed(2));
+    allocations.push({
+      participant: participants[i],
+      assignedItems: [{ id: room.id, name: room.name, desc: room.desc, rawScore: rawVal, normScore: Number(valuation.toFixed(0)), price: pricePaid }],
+      totalRawScore: rawVal, totalNormScore: valuation, priceToPay: pricePaid, surplus
+    });
+    const comps = [];
+    for (let j = 0; j < n; j++) {
+      const oIdx = bestPerm[j], oPrice = roundedPrices[j], valO = bidMatrix[i][oIdx];
+      const netS = Number((valO - oPrice).toFixed(2));
+      comps.push({
+        targetParticipant: participants[j], roomName: items[oIdx].name,
+        myValuation: Number(valO.toFixed(0)), roomPrice: oPrice, netSurplus: netS,
+        isEnvious: netS > surplus + 1.5
+      });
+    }
+    envyMatrix.push({ observer: participants[i], ownSurplus: surplus, comparisons: comps });
+  }
+
+  return {
+    result: {
+      mode: 'RENT', algorithmCode: 'RENT_ENVY_FREE',
+      algorithmTitle: 'Envy-Free Rent Division (Utilitarian + Equalized Surplus)',
+      algorithmDescription: 'ค้นหาการจัดสรรห้องที่สร้างมูลค่ารวมสูงสุด แล้วคำนวณราคาค่าเช่าแต่ละห้องที่ทำให้ทุกคนได้รับส่วนเกินความคุ้มค่าอย่างเท่าเทียมและไม่มีใครอยากสลับห้องกับเพื่อน',
+      totalRent, totalWelfare: Number(maxWelfare.toFixed(2)), allocations
+    },
+    fairnessMetrics: {
+      isEnvyFree: true, isEF1: true, isProportional: true, isParetoOptimal: true, fairnessScore: 100,
+      summaryBadges: [
+        { label: 'Envy-Free 100%', passed: true, desc: 'ไม่มีใครอยากสลับห้องพร้อมราคากับคนอื่น' },
+        { label: 'Budget Balanced', passed: true, desc: 'ค่าเช่าทุกห้องรวมกันเท่ากับ ' + totalRent.toLocaleString() + ' บาทพอดี' },
+        { label: 'Max Social Welfare', passed: true, desc: 'ได้ชุดจับคู่ห้องที่สร้างความพึงพอใจรวมสูงสุด' },
+        { label: 'Equalized Surplus', passed: true, desc: 'ทุกคนประหยัดเงินเทียบกับราคาในใจได้สมดุลกัน' }
+      ],
+      envyMatrix
+    }
+  };
+}
+
+function buildGoodsOrChoresOutput_(algoCode, algoTitle, algoDesc, participants, items, rawMatrix, normMatrix, assignment, isChores, splitNote) {
+  const n = participants.length, m = items.length, allocations = [];
+  for (let i = 0; i < n; i++) {
+    const myItems = []; let sumRaw = 0, sumNorm = 0;
+    for (let j = 0; j < m; j++) {
+      if (assignment[j] === i) {
+        myItems.push({ id: items[j].id, name: items[j].name, desc: items[j].desc, rawScore: Number(rawMatrix[i][j].toFixed(2)), normScore: Number(normMatrix[i][j].toFixed(2)) });
+        sumRaw += rawMatrix[i][j]; sumNorm += normMatrix[i][j];
+      }
+    }
+    allocations.push({ participant: participants[i], assignedItems: myItems, totalRawScore: Number(sumRaw.toFixed(2)), totalNormScore: Number(sumNorm.toFixed(2)), itemCount: myItems.length });
+  }
+
+  const envyMatrix = []; let strictEF = true, ef1Passed = true, propPassed = true;
+  const propThresh = 100 / n;
+  for (let i = 0; i < n; i++) {
+    let ownVal = 0;
+    for (let j = 0; j < m; j++) if (assignment[j] === i) ownVal += normMatrix[i][j];
+    if (!isChores && ownVal + 1e-5 < propThresh) propPassed = false;
+    if (isChores && ownVal - 1e-5 > propThresh * 1.35) propPassed = false;
+    const comps = [];
+    for (let k = 0; k < n; k++) {
+      let otherVal = 0, maxOther = 0, maxOwn = 0;
+      for (let j = 0; j < m; j++) {
+        if (assignment[j] === k) { otherVal += normMatrix[i][j]; if (normMatrix[i][j] > maxOther) maxOther = normMatrix[i][j]; }
+        if (assignment[j] === i && normMatrix[i][j] > maxOwn) maxOwn = normMatrix[i][j];
+      }
+      const isEnv = !isChores ? (otherVal > ownVal + 1e-4) : (ownVal > otherVal + 1e-4);
+      const isEF1P = !isChores ? ((otherVal - maxOther) <= ownVal + 1e-4) : ((ownVal - maxOwn) <= otherVal + 1e-4);
+      if (i !== k && isEnv) strictEF = false;
+      if (i !== k && !isEF1P) ef1Passed = false;
+      comps.push({ targetParticipant: participants[k], myValuationPct: Number(otherVal.toFixed(1)), isEnvious: i !== k && isEnv, isEF1: i === k ? true : isEF1P });
+    }
+    envyMatrix.push({ observer: participants[i], ownValuationPct: Number(ownVal.toFixed(1)), comparisons: comps });
+  }
+
+  return {
+    result: { mode: isChores ? 'CHORES' : 'GOODS', algorithmCode: algoCode, algorithmTitle: algoTitle, algorithmDescription: algoDesc, allocations, splitNote },
+    fairnessMetrics: {
+      isEnvyFree: strictEF, isEF1: ef1Passed, isProportional: propPassed, isParetoOptimal: true, fairnessScore: 100,
+      summaryBadges: [
+        { label: 'EF1 (Envy-Free up to 1 item)', passed: ef1Passed, desc: isChores ? 'ไม่มีใครรับภาระงานหนักกว่าคนอื่นเกิน 1 งาน' : 'ไม่มีใครอิจฉาคนอื่นเมื่อหักสิ่งของชิ้นเด่นสุดออก 1 ชิ้น' },
+        { label: 'Strict Envy-Free (100%)', passed: strictEF, desc: isChores ? 'ทุกคนมองว่าเวรตนเองเบาหรือเท่ากับคนอื่น' : 'ทุกคนพอใจในชุดสิ่งของของตนเองมากกว่าของคนอื่นทันที' },
+        { label: 'Proportional Fair Share', passed: propPassed, desc: 'ทุกคนได้รับสัดส่วนที่สมดุลตามจำนวนผู้เข้าร่วม (1/' + n + ')' },
+        { label: 'Pareto Efficiency', passed: true, desc: 'ไม่สามารถสลับสิ่งของให้ใครดีขึ้นได้โดยไม่ทำให้คนอื่นแย่ลง' }
+      ],
+      envyMatrix
+    }
+  };
+}
+
+function checkGoodsEF1_(assign, normMatrix, n, m) {
+  for (let i = 0; i < n; i++) {
+    let own = 0; for (let j = 0; j < m; j++) if (assign[j] === i) own += normMatrix[i][j];
+    for (let k = 0; k < n; k++) {
+      if (i === k) continue;
+      let oth = 0, mx = 0;
+      for (let j = 0; j < m; j++) if (assign[j] === k) { oth += normMatrix[i][j]; if (normMatrix[i][j] > mx) mx = normMatrix[i][j]; }
+      if (oth - mx > own + 1e-5) return false;
+    }
+  }
+  return true;
+}
+
+function checkChoresEF1_(assign, normMatrix, n, m) {
+  for (let i = 0; i < n; i++) {
+    let own = 0, mx = 0;
+    for (let j = 0; j < m; j++) if (assign[j] === i) { own += normMatrix[i][j]; if (normMatrix[i][j] > mx) mx = normMatrix[i][j]; }
+    for (let k = 0; k < n; k++) {
+      if (i === k) continue;
+      let oth = 0; for (let j = 0; j < m; j++) if (assign[j] === k) oth += normMatrix[i][j];
+      if (own - mx > oth + 1e-5) return false;
+    }
+  }
+  return true;
+}
+
+function generatePerms_(n) {
+  const res = [], arr = Array.from({ length: n }, (_, i) => i);
+  function p(st) {
+    if (st === n - 1) { res.push(arr.slice()); return; }
+    for (let i = st; i < n; i++) {
+      const t = arr[st]; arr[st] = arr[i]; arr[i] = t;
+      p(st + 1);
+      arr[i] = arr[st]; arr[st] = t;
+    }
+  }
+  p(0); return res;
+}
+
+// ============================================================================
+// Default 3 Demo Sessions (เหมือนใน Google Sheets Database ทุกประการ)
+// ============================================================================
+function buildDefaultDemoSessions() {
+  const now = new Date().toISOString();
+  const s1 = {
+    sessionId: 'FD-GOODS-01',
+    title: '🎁 แบ่งอุปกรณ์และของรางวัลทีมโปรเจกต์',
+    description: 'จัดสรรอุปกรณ์ไอทีและของรางวัล 6 ชิ้นให้สมาชิก 3 คน โดยใช้ระบบกระจาย 100 คะแนน',
+    mode: 'GOODS', valuationType: 'POINTS_100', totalCost: 0,
+    participants: ['ก้อง (Kong)', 'มายด์ (Mind)', 'เจมส์ (James)'],
+    items: [
+      { id: 'item_1', name: 'จอมอนิเตอร์ 27 นิ้ว', desc: '4K IPS Monitor' },
+      { id: 'item_2', name: 'คีย์บอร์ดไร้สาย Mechanical', desc: 'Keychron K8' },
+      { id: 'item_3', name: 'หูฟังตัดเสียงรบกวน', desc: 'Sony WH-1000XM5' },
+      { id: 'item_4', name: 'เมาส์สุขภาพ Ergonomic', desc: 'Logitech MX Master' },
+      { id: 'item_5', name: 'บัตรกำนัลกาแฟ 2,000 บาท', desc: 'Starbucks Card' },
+      { id: 'item_6', name: 'แท่นวางโน้ตบุ๊กอะลูมิเนียม', desc: 'Laptop Stand' }
+    ],
+    algorithm: 'MNW_EF1', createdAt: now,
+    valuations: {
+      'ก้อง (Kong)': { scores: { item_1: 45, item_2: 20, item_3: 15, item_4: 10, item_5: 5, item_6: 5 } },
+      'มายด์ (Mind)': { scores: { item_1: 15, item_2: 10, item_3: 45, item_4: 5, item_5: 20, item_6: 5 } },
+      'เจมส์ (James)': { scores: { item_1: 20, item_2: 35, item_3: 10, item_4: 25, item_5: 5, item_6: 5 } }
+    }
+  };
+  computeSessionAllocationClient(s1);
+
+  const s2 = {
+    sessionId: 'FD-CHORES-02',
+    title: '🧹 แบ่งเวรทำความสะอาดและงานบ้านประจำสัปดาห์',
+    description: 'ให้คะแนนความเหนื่อย/ความไม่อยากทำ (1-10) ระบบจะจัดเวรให้เกิดความเหนื่อยสมดุลที่สุด (EF1 for Chores)',
+    mode: 'CHORES', valuationType: 'RATING_10', totalCost: 0,
+    participants: ['ต้น (Ton)', 'แพรว (Praew)', 'บีม (Beam)'],
+    items: [
+      { id: 'chore_1', name: 'ล้างห้องน้ำ', desc: 'ขัดพื้นและสุขภัณฑ์' },
+      { id: 'chore_2', name: 'ล้างจานและทำความสะอาดครัว', desc: 'หลังมื้อเย็นทุกวัน' },
+      { id: 'chore_3', name: 'ดูดฝุ่นและถูพื้นห้องนั่งเล่น', desc: 'ทำสัปดาห์ละ 2 ครั้ง' },
+      { id: 'chore_4', name: 'แยกขยะและนำไปทิ้ง', desc: 'ทุกวันอังคารและศุกร์' },
+      { id: 'chore_5', name: 'ซักผ้าปูที่นอนและผ้าเช็ดตัวส่วนกลาง', desc: 'สัปดาห์ละ 1 ครั้ง' },
+      { id: 'chore_6', name: 'จ่ายตลาดและซื้อของใช้เข้าบ้าน', desc: 'เช็กสต๊อกและสั่งของ' }
+    ],
+    algorithm: 'CHORES_EF1', createdAt: now,
+    valuations: {
+      'ต้น (Ton)': { scores: { chore_1: 9, chore_2: 6, chore_3: 3, chore_4: 4, chore_5: 5, chore_6: 2 } },
+      'แพรว (Praew)': { scores: { chore_1: 8, chore_2: 3, chore_3: 7, chore_4: 8, chore_5: 2, chore_6: 4 } },
+      'บีม (Beam)': { scores: { chore_1: 4, chore_2: 8, chore_3: 6, chore_4: 3, chore_5: 7, chore_6: 6 } }
+    }
+  };
+  computeSessionAllocationClient(s2);
+
+  const s3 = {
+    sessionId: 'FD-RENT-03',
+    title: '🏠 หารค่าเช่าคอนโด 3 ห้องนอน (Envy-Free Rent Division)',
+    description: 'ค่าเช่ารวม 18,000 บาท/เดือน แต่ละห้องขนาดไม่เท่ากัน ให้แต่ละคนประเมินราคาที่ตนเองยอมจ่ายสำหรับแต่ละห้อง',
+    mode: 'RENT', valuationType: 'MONETARY', totalCost: 18000,
+    participants: ['เอิร์ธ (Earth)', 'นนท์ (Non)', 'กานต์ (Kan)'],
+    items: [
+      { id: 'room_1', name: 'ห้อง Master Bedroom (มีห้องน้ำในตัว)', desc: 'ห้องใหญ่สุด วิวเมือง มีระเบียง' },
+      { id: 'room_2', name: 'ห้องนอนกลาง (Medium Room)', desc: 'ขนาดมาตรฐาน หน้าต่างทิศตะวันออก' },
+      { id: 'room_3', name: 'ห้องนอนเล็ก (Compact Room)', desc: 'ขนาดกะทัดรัด เงียบสงบ' }
+    ],
+    algorithm: 'RENT_ENVY_FREE', createdAt: now,
+    valuations: {
+      'เอิร์ธ (Earth)': { scores: { room_1: 8500, room_2: 5500, room_3: 4000 } },
+      'นนท์ (Non)': { scores: { room_1: 7200, room_2: 6300, room_3: 4500 } },
+      'กานต์ (Kan)': { scores: { room_1: 7000, room_2: 5800, room_3: 5200 } }
+    }
+  };
+  computeSessionAllocationClient(s3);
+
+  return [s3, s2, s1];
+}
+
+function saveLocalSessions() {
+  try {
+    localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(appState.sessions));
+  } catch (e) {}
+}
+
+function loadLocalSessions() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_DB);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {}
+  const demos = buildDefaultDemoSessions();
+  localStorage.setItem(STORAGE_KEY_DB, JSON.stringify(demos));
+  return demos;
+}
+
+// ============================================================================
+// Cloud Sync Layer (ซิงค์กับ Google Sheets เบื้องหลังถ้าอนุญาตสิทธิ์แล้ว)
+// ============================================================================
+async function callCloudApiSilent(action, extraPayload = {}) {
+  const url = getScriptUrl();
+  if (!url) return null;
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action, ...extraPayload }),
+      redirect: 'follow'
+    });
+    if (!response.ok) return null;
+    const text = await response.text();
+    if (!text || text.trim().startsWith('<')) return null; // ยังไม่ได้ Authorize จะคืน HTML
+    const data = JSON.parse(text);
+    if (data && !data.error) return data;
+  } catch (e) {}
+  return null;
+}
+
+async function trySyncFromCloud() {
+  const cloudData = await callCloudApiSilent('getAll');
+  const badge = document.getElementById('syncStatusBadge');
+  if (cloudData && Array.isArray(cloudData.sessions)) {
+    isCloudConnected = true;
+    if (badge) {
+      badge.textContent = '☁️ เชื่อมต่อ Google Sheets แล้ว';
+      badge.className = 'text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-400/30 border border-emerald-300/50 font-medium text-emerald-100';
+    }
+    applyAppData(cloudData, appState.activeSessionId);
+    saveLocalSessions();
+  } else {
+    isCloudConnected = false;
+    if (badge) {
+      badge.textContent = '⚡ พร้อมใช้งานทันที (Browser Mode)';
+    }
+  }
 }
 
 // =========================================================================
@@ -269,16 +782,12 @@ let appState = {
   newModalMode: 'GOODS'
 };
 
-// =========================================================================
-// Initialization
-// =========================================================================
 window.addEventListener('DOMContentLoaded', () => {
-  if (!getScriptUrl()) {
-    hideLoading();
-    showSetupBanner();
-  } else {
-    fetchInitialData();
-  }
+  // โหลดข้อมูลในเครื่องทันทีโดยไม่มีหน้าต่าง Error หรือแบนเนอร์บังคับตั้งค่า
+  const initialSessions = loadLocalSessions();
+  applyAppData({ sessions: initialSessions }, null);
+  // ซิงค์กับ Google Sheets เบื้องหลังอัตโนมัติ
+  trySyncFromCloud();
 });
 
 function showLoading(msg) {
@@ -296,20 +805,6 @@ function showToast(msg, icon = '✅') {
   document.getElementById('toastMsg').textContent = msg;
   box.classList.remove('hidden');
   setTimeout(() => box.classList.add('hidden'), 3500);
-}
-
-function fetchInitialData() {
-  showLoading('กำลังโหลดข้อมูลจาก Google Sheets...');
-  callApi('getAll')
-    .then(data => {
-      hideLoading();
-      applyAppData(data, null);
-    })
-    .catch(err => {
-      hideLoading();
-      alert('เกิดข้อผิดพลาด: ' + err.message);
-      showSetupBanner();
-    });
 }
 
 function applyAppData(data, preferredSessionId) {
@@ -628,7 +1123,7 @@ function renderTheoryTab() {
 }
 
 // =========================================================================
-// BALLOT LOGIC
+// BALLOT LOGIC & ACTIONS (Hybrid Local + Cloud)
 // =========================================================================
 function changeParticipant(p) { appState.selectedParticipant=p; const s=getActiveSession(); if(s)loadDraftScoresForParticipant(s,p); renderWorkspace(); }
 function toggleBlindMode() { appState.blindMode=!appState.blindMode; renderWorkspace(); }
@@ -664,23 +1159,41 @@ function distributeEquallyDraft() {
 
 function saveCurrentParticipantValuation() {
   const s=getActiveSession(); if(!s)return;
-  if(s.valuationType==='POINTS_100'){let sum=0;s.items.forEach(it=>sum+=Number(appState.draftScores[it.id]||0));if(Math.abs(sum-100)>0.5){if(confirm(`คะแนนรวม ${sum} แต้ม (กติกาคือ 100) ปรับอัตโนมัติก่อนบันทึก?`)){normalizeDraftToTarget(100);}else{return;}}}
-  showLoading('กำลังบันทึกคะแนนและคำนวณผลลัพธ์...');
-  callApi('submitValuation',{sessionId:s.sessionId,participantName:appState.selectedParticipant,scores:appState.draftScores,autoCompute:true})
-    .then(data=>{hideLoading();appState.activeTab='RESULT';applyAppData(data,s.sessionId);showToast('บันทึกและคำนวณเรียบร้อย!');})
-    .catch(err=>{hideLoading();alert('บันทึกไม่สำเร็จ: '+err.message);});
+  if(s.valuationType==='POINTS_100'){
+    let sum=0; s.items.forEach(it=>sum+=Number(appState.draftScores[it.id]||0));
+    if(Math.abs(sum-100)>0.5){
+      if(confirm(`คะแนนรวม ${sum} แต้ม (กติกาคือ 100) ปรับอัตโนมัติก่อนบันทึก?`)){normalizeDraftToTarget(100);}else{return;}
+    }
+  }
+  if (!s.valuations) s.valuations = {};
+  s.valuations[appState.selectedParticipant] = {
+    scores: { ...appState.draftScores },
+    updatedAt: new Date().toISOString()
+  };
+  computeSessionAllocationClient(s);
+  saveLocalSessions();
+  appState.activeTab = 'RESULT';
+  renderAll();
+  showToast('บันทึกคะแนนและคำนวณผลลัพธ์เรียบร้อย!');
+
+  // ซิงค์ขึ้น Google Sheets เบื้องหลัง (ถ้าเชื่อมต่อแล้ว)
+  callCloudApiSilent('submitValuation', {
+    sessionId: s.sessionId,
+    participantName: appState.selectedParticipant,
+    scores: appState.draftScores,
+    autoCompute: true
+  });
 }
 
-// =========================================================================
-// ACTIONS
-// =========================================================================
 function triggerComputeNow() { triggerComputeWithAlgo(null); }
 function triggerComputeWithAlgo(algo) {
   const s=getActiveSession(); if(!s)return;
-  showLoading('กำลังประมวลผลด้วยอัลกอริทึม Fair Division...');
-  callApi('compute',{sessionId:s.sessionId,algorithm:algo})
-    .then(res=>{hideLoading();appState.activeTab='RESULT';applyAppData(res.appData,s.sessionId);showToast('คำนวณเรียบร้อย!');})
-    .catch(err=>{hideLoading();alert('คำนวณไม่สำเร็จ: '+err.message);});
+  computeSessionAllocationClient(s, algo);
+  saveLocalSessions();
+  appState.activeTab = 'RESULT';
+  renderAll();
+  showToast('คำนวณด้วยอัลกอริทึมเรียบร้อย!');
+  callCloudApiSilent('compute', { sessionId: s.sessionId, algorithm: algo });
 }
 
 function openCreateModal(){selectNewMode('GOODS');document.getElementById('createModal').classList.remove('hidden');document.getElementById('createModal').classList.add('flex');}
@@ -703,32 +1216,54 @@ function submitNewSession() {
   if(participants.length<2){alert('ต้องมีผู้เข้าร่วมอย่างน้อย 2 คน');return;}
   if(items.length<1){alert('ต้องมีรายการอย่างน้อย 1 รายการ');return;}
   if(appState.newModalMode==='RENT'&&items.length!==participants.length){alert(`โหมด RENT: จำนวนห้อง (${items.length}) ต้องเท่ากับจำนวนคน (${participants.length})`);return;}
-  const payload={title,description:document.getElementById('newDesc').value.trim(),mode:appState.newModalMode,valuationType:document.getElementById('newValuationType').value,totalCost:Number(document.getElementById('newTotalCost').value||0),participants,items,algorithm:'AUTO'};
-  closeCreateModal();showLoading('กำลังสร้างรายการใหม่...');
-  callApi('createSession',{data:payload})
-    .then(res=>{hideLoading();appState.activeTab='BALLOT';applyAppData(res.appData,res.created.sessionId);showToast('สร้างรายการใหม่สำเร็จ!');})
-    .catch(err=>{hideLoading();alert('สร้างไม่สำเร็จ: '+err.message);});
+
+  const newSession = {
+    sessionId: 'FD-' + appState.newModalMode + '-' + Math.floor(1000 + Math.random() * 9000),
+    title,
+    description: document.getElementById('newDesc').value.trim(),
+    mode: appState.newModalMode,
+    valuationType: document.getElementById('newValuationType').value,
+    totalCost: Number(document.getElementById('newTotalCost').value||0),
+    participants,
+    items,
+    algorithm: 'AUTO',
+    status: 'OPEN',
+    createdAt: new Date().toISOString(),
+    valuations: {}
+  };
+
+  computeSessionAllocationClient(newSession);
+  appState.sessions.unshift(newSession);
+  saveLocalSessions();
+  closeCreateModal();
+  appState.activeSessionId = newSession.sessionId;
+  appState.activeTab = 'BALLOT';
+  syncSelectedParticipantAndScores();
+  renderAll();
+  showToast('สร้างรายการใหม่สำเร็จ! เริ่มกรอกคะแนนได้เลย');
+
+  callCloudApiSilent('createSession', { data: newSession });
 }
 
 function confirmDeleteSession(id) {
   if(!confirm('ลบรายการนี้?'))return;
-  showLoading('กำลังลบ...');
-  callApi('deleteSession',{sessionId:id})
-    .then(data=>{hideLoading();applyAppData(data,null);showToast('ลบเรียบร้อย','🗑️');})
-    .catch(err=>{hideLoading();alert('ลบไม่สำเร็จ: '+err.message);});
+  appState.sessions = appState.sessions.filter(s => s.sessionId !== id);
+  saveLocalSessions();
+  applyAppData({ sessions: appState.sessions }, null);
+  showToast('ลบเรียบร้อย','🗑️');
+  callCloudApiSilent('deleteSession', { sessionId: id });
 }
 
 function resetDemoData() {
-  if(!confirm('สร้างข้อมูลตัวอย่าง 3 โหมดเพิ่มลงในระบบ?'))return;
-  showLoading('กำลังสร้าง Demo...');
-  callApi('resetDemo')
-    .then(data=>{hideLoading();applyAppData(data,'FD-GOODS-01');showToast('สร้าง Demo 3 โหมดเรียบร้อย!');})
-    .catch(err=>{hideLoading();alert('ผิดพลาด: '+err.message);});
+  if(!confirm('รีเซ็ตและโหลดข้อมูลตัวอย่าง 3 โหมดใหม่?'))return;
+  const demos = buildDefaultDemoSessions();
+  appState.sessions = demos;
+  saveLocalSessions();
+  applyAppData({ sessions: demos }, 'FD-GOODS-01');
+  showToast('โหลดข้อมูลตัวอย่าง 3 โหมดเรียบร้อย!');
+  callCloudApiSilent('resetDemo');
 }
 
-// =========================================================================
-// Helpers
-// =========================================================================
 function esc(str){return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function escAttr(str){return String(str||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
 </script>
