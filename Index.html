@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FairShare | ระบบจัดสรรอย่างยุติธรรมด้วยทฤษฎี Fair Division</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .gradient-header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #4c1d95 100%);
+    }
+    .card-shadow {
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+    }
+    input[type="range"] {
+      accent-color: #4f46e5;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top Navigation Header -->
+  <header class="gradient-header text-white shadow-lg sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center text-2xl shadow-inner">
+          ⚖️
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold tracking-tight">FairShare Engine</h1>
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-400/30 border border-indigo-300/40 font-medium">
+              Fair Division Web App
+            </span>
+          </div>
+          <p class="text-xs text-indigo-100/90">
+            ระบบแบ่งสิ่งของ จัดเวรทำงาน และหารค่าเช่าห้องอย่างยุติธรรมตามทฤษฎีคณิตศาสตร์เศรษฐศาสตร์
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <a id="sheetLinkBtn" href="#" target="_blank"
+           class="hidden sm:inline-flex items-center gap-1.5 text-xs bg-white/10 hover:bg-white/20 border border-white/20 px-3.5 py-2 rounded-lg transition">
+          <span>📊 เปิด Google Sheets (Database)</span>
+        </a>
+        <button onclick="openCreateModal()"
+                class="inline-flex items-center gap-1.5 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg shadow transition">
+          <span>＋ สร้างรายการแบ่งสรรใหม่</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-3 max-w-xs w-full mx-4">
+      <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      <p id="loadingText" class="text-sm font-medium text-slate-700 text-center">กำลังเชื่อมต่อฐานข้อมูล Google Sheets...</p>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBox" class="fixed bottom-5 right-5 z-50 hidden">
+    <div id="toastInner" class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl text-sm flex items-center gap-2.5">
+      <span id="toastIcon">✅</span>
+      <span id="toastMsg">บันทึกสำเร็จ</span>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Column: Session List & Mode Filter -->
+    <aside class="lg:col-span-4 xl:col-span-3 flex flex-col gap-4">
+      <div class="bg-white rounded-2xl border border-slate-200/80 card-shadow p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">รายการแบ่งสรร (Sessions)</h2>
+          <span id="sessionCountBadge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">0</span>
+        </div>
+
+        <!-- Mode Filter Pills -->
+        <div class="grid grid-cols-4 gap-1 bg-slate-100 p-1 rounded-xl text-xs font-medium mb-3">
+          <button onclick="setModeFilter('ALL')" id="filter_ALL" class="py-1.5 rounded-lg bg-white text-indigo-700 shadow-xs transition">ทั้งหมด</button>
+          <button onclick="setModeFilter('GOODS')" id="filter_GOODS" class="py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">🎁 ของ</button>
+          <button onclick="setModeFilter('CHORES')" id="filter_CHORES" class="py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">🧹 เวร</button>
+          <button onclick="setModeFilter('RENT')" id="filter_RENT" class="py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">🏠 ห้อง</button>
+        </div>
+
+        <!-- Session Cards List -->
+        <div id="sessionListContainer" class="space-y-2.5 max-h-[60vh] overflow-y-auto custom-scrollbar pr-1">
+          <!-- Rendered by JS -->
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>ต้องการข้อมูลตัวอย่างใหม่?</span>
+          <button onclick="resetDemoData()" class="text-indigo-600 hover:text-indigo-800 font-medium underline cursor-pointer">
+            รีเซ็ต Demo 3 โหมด
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Theory Summary Card -->
+      <div class="bg-gradient-to-br from-indigo-950 to-slate-900 text-white rounded-2xl p-4 card-shadow">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-300 mb-2">💡 ทำไมต้อง Fair Division?</h3>
+        <ul class="text-xs space-y-2 text-slate-200 leading-relaxed">
+          <li>• <b>Envy-Free (EF / EF1):</b> ป้องกันความรู้สึกว่า "ของคนอื่นดีกว่าของเรา"</li>
+          <li>• <b>Pareto Optimal:</b> จัดของให้คนที่เห็นคุณค่าของสิ่งนั้นสูงสุดเสมอ</li>
+          <li>• <b>Strategy-Resistant:</b> ปรับฐานคะแนน 100% อัตโนมัติ ป้องกันการทุ่มคะแนนเกินจริง</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Right Column: Active Session Workspace -->
+    <section class="lg:col-span-8 xl:col-span-9 flex flex-col gap-5" id="workspaceColumn">
+      <!-- Rendered dynamically by JS -->
+    </section>
+
+  </main>
+
+  <!-- Modal: Create New Session -->
+  <div id="createModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 my-8 max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">✨ สร้างรายการแบ่งสรรใหม่ (New Fair Division Session)</h3>
+          <p class="text-xs text-slate-500">ข้อมูลจะถูกบันทึกลงใน Google Sheets อัตโนมัติ</p>
+        </div>
+        <button onclick="closeCreateModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold px-2">✕</button>
+      </div>
+
+      <div class="space-y-4 mt-4">
+        <!-- 1. Select Mode -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-2">1. เลือกโหมดการแบ่งสรร</label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <button type="button" onclick="selectNewMode('GOODS')" id="modeBtn_GOODS"
+                    class="p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/60 text-left transition">
+              <div class="text-lg">🎁 แบ่งสิ่งของ</div>
+              <div class="text-xs text-slate-600 mt-0.5">ของรางวัล, มรดก, อุปกรณ์ (ยิ่งได้มากยิ่งดี)</div>
+            </button>
+            <button type="button" onclick="selectNewMode('CHORES')" id="modeBtn_CHORES"
+                    class="p-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 text-left transition">
+              <div class="text-lg">🧹 แบ่งภาระงาน/เวร</div>
+              <div class="text-xs text-slate-600 mt-0.5">งานบ้าน, จัดเวร, ภาระงาน (เกลี่ยความเหนื่อย)</div>
+            </button>
+            <button type="button" onclick="selectNewMode('RENT')" id="modeBtn_RENT"
+                    class="p-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 text-left transition">
+              <div class="text-lg">🏠 แบ่งห้อง & หารค่าเช่า</div>
+              <div class="text-xs text-slate-600 mt-0.5">จัดห้องพักพร้อมคำนวณราคาที่ไม่ใครอิจฉา</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Title & Description -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อหัวข้อรายการ *</label>
+            <input id="newTitle" type="text" placeholder="เช่น แบ่งของขวัญปีใหม่ / หารค่าห้องทริปภูเก็ต"
+                   class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">คำอธิบายเพิ่มเติม</label>
+            <input id="newDesc" type="text" placeholder="รายละเอียดหรือกติกาเบื้องต้น"
+                   class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- 3. Valuation Type & Total Cost (for Rent) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">รูปแบบการให้คะแนนความพึงพอใจ</label>
+            <select id="newValuationType" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              <option value="POINTS_100">🎯 แจกแต้มจำกัด (คนละ 100 คะแนน)</option>
+              <option value="RATING_10">⭐ ให้คะแนนอิสระ (ระดับ 0 - 10 คะแนน)</option>
+              <option value="MONETARY">฿ ประเมินมูลค่าเป็นจำนวนเงิน (บาท)</option>
+            </select>
+          </div>
+          <div id="newTotalCostWrap" class="hidden">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ค่าเช่ารวม / ค่าใช้จ่ายรวมทั้งหมด (บาท) *</label>
+            <input id="newTotalCost" type="number" value="15000" min="0" step="100"
+                   class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- 4. Participants -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">
+            รายชื่อผู้เข้าร่วม (คั่นด้วยเครื่องหมายจุลภาค <code class="bg-slate-100 px-1 rounded">,</code> หรือขึ้นบรรทัดใหม่) *
+          </label>
+          <textarea id="newParticipants" rows="2" placeholder="เช่น แอน, บอย, เคท"
+                    class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">แอน (Ann), บอย (Boy), เคท (Kate)</textarea>
+        </div>
+
+        <!-- 5. Items / Chores / Rooms -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-semibold text-slate-700" id="newItemsLabel">
+              รายการสิ่งของที่จะแบ่ง (บรรทัดละ 1 รายการ, ใส่เครื่องหมาย : เพื่อเพิ่มคำอธิบายได้) *
+            </label>
+            <span class="text-[11px] text-slate-400">ตัวอย่าง: ห้องนอนใหญ่ : มีห้องน้ำในตัว</span>
+          </div>
+          <textarea id="newItems" rows="5"
+                    class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">ไอแพด Gen 10 : สีฟ้า 64GB
+ลำโพง Bluetooth Marshall : เสียงเบสแน่น
+หูฟังไร้สาย AirPods : สภาพใหม่
+บัตรของขวัญเซ็นทรัล 3,000 บาท : ใช้ได้ทุกสาขา</textarea>
+        </div>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
+        <button onclick="closeCreateModal()" class="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100">
+          ยกเลิก
+        </button>
+        <button onclick="submitNewSession()" class="px-5 py-2 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow">
+          💾 บันทึกและเปิดรายการนี้
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // Global Application State
+    // =========================================================================
+    const INITIAL_SESSION_FROM_URL = "<?= initialSessionId ?>";
+    let appState = {
+      spreadsheetUrl: '#',
+      spreadsheetName: '',
+      sessions: [],
+      activeSessionId: null,
+      modeFilter: 'ALL',
+      activeTab: 'RESULT', // 'BALLOT' | 'RESULT' | 'THEORY'
+      selectedParticipant: null,
+      draftScores: {},     // { itemId: number }
+      blindMode: false,    // ซ่อนตารางคะแนนรวมเพื่อทำ Secret Ballot
+      newModalMode: 'GOODS'
+    };
+
+    // =========================================================================
+    // Initialization
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchInitialData();
+    });
+
+    function showLoading(msg) {
+      document.getElementById('loadingText').textContent = msg || 'กำลังประมวลผล...';
+      document.getElementById('loadingOverlay').classList.remove('hidden');
+      document.getElementById('loadingOverlay').classList.add('flex');
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.add('hidden');
+      document.getElementById('loadingOverlay').classList.remove('flex');
+    }
+
+    function showToast(msg, icon = '✅') {
+      const box = document.getElementById('toastBox');
+      document.getElementById('toastIcon').textContent = icon;
+      document.getElementById('toastMsg').textContent = msg;
+      box.classList.remove('hidden');
+      setTimeout(() => box.classList.add('hidden'), 3500);
+    }
+
+    function fetchInitialData() {
+      showLoading('กำลังโหลดข้อมูลจาก Google Sheets...');
+      google.script.run
+        .withSuccessHandler(data => {
+          hideLoading();
+          applyAppData(data, INITIAL_SESSION_FROM_URL);
+        })
+        .withFailureHandler(err => {
+          hideLoading();
+          alert('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + (err.message || err));
+        })
+        .apiGetInitialData();
+    }
+
+    function applyAppData(data, preferredSessionId) {
+      appState.spreadsheetUrl = data.spreadsheetUrl || '#';
+      appState.spreadsheetName = data.spreadsheetName || 'Google Sheets';
+      appState.sessions = data.sessions || [];
+
+      const sheetBtn = document.getElementById('sheetLinkBtn');
+      if (appState.spreadsheetUrl && appState.spreadsheetUrl !== '#') {
+        sheetBtn.href = appState.spreadsheetUrl;
+      }
+
+      if (preferredSessionId && appState.sessions.some(s => s.sessionId === preferredSessionId)) {
+        appState.activeSessionId = preferredSessionId;
+      } else if (!appState.activeSessionId || !appState.sessions.some(s => s.sessionId === appState.activeSessionId)) {
+        appState.activeSessionId = appState.sessions.length > 0 ? appState.sessions[0].sessionId : null;
+      }
+
+      syncSelectedParticipantAndScores();
+      renderAll();
+    }
+
+    function getActiveSession() {
+      return appState.sessions.find(s => s.sessionId === appState.activeSessionId) || null;
+    }
+
+    function syncSelectedParticipantAndScores() {
+      const s = getActiveSession();
+      if (!s) return;
+      if (!appState.selectedParticipant || !s.participants.includes(appState.selectedParticipant)) {
+        appState.selectedParticipant = s.participants[0] || '';
+      }
+      loadDraftScoresForParticipant(s, appState.selectedParticipant);
+    }
+
+    function loadDraftScoresForParticipant(session, participantName) {
+      const existing = (session.valuations && session.valuations[participantName] && session.valuations[participantName].scores)
+        ? session.valuations[participantName].scores
+        : null;
+
+      appState.draftScores = {};
+      const m = session.items.length || 1;
+
+      session.items.forEach((it, idx) => {
+        if (existing && existing[it.id] !== undefined) {
+          appState.draftScores[it.id] = Number(existing[it.id]);
+        } else {
+          // ค่าเริ่มต้นตามประเภทการให้คะแนน
+          if (session.valuationType === 'POINTS_100') {
+            const base = Math.floor(100 / m);
+            const rem = 100 - base * m;
+            appState.draftScores[it.id] = base + (idx < rem ? 1 : 0);
+          } else if (session.valuationType === 'RATING_10') {
+            appState.draftScores[it.id] = 5;
+          } else {
+            const total = session.totalCost > 0 ? session.totalCost : m * 1000;
+            appState.draftScores[it.id] = Math.round(total / m);
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // Rendering Functions
+    // =========================================================================
+    function renderAll() {
+      renderSessionList();
+      renderWorkspace();
+    }
+
+    function setModeFilter(mode) {
+      appState.modeFilter = mode;
+      ['ALL', 'GOODS', 'CHORES', 'RENT'].forEach(m => {
+        const btn = document.getElementById('filter_' + m);
+        if (m === mode) {
+          btn.className = 'py-1.5 rounded-lg bg-white text-indigo-700 shadow-xs font-semibold transition';
+        } else {
+          btn.className = 'py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition';
+        }
+      });
+      renderSessionList();
+    }
+
+    function renderSessionList() {
+      const container = document.getElementById('sessionListContainer');
+      const filtered = appState.sessions.filter(s => appState.modeFilter === 'ALL' || s.mode === appState.modeFilter);
+      document.getElementById('sessionCountBadge').textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 px-4 text-slate-400 text-xs">
+            ไม่มีรายการในหมวดหมู่นี้<br>กดปุ่ม <b>+ สร้างรายการแบ่งสรรใหม่</b> ด้านบนได้เลยครับ
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(s => {
+        const isActive = s.sessionId === appState.activeSessionId;
+        const modeBadge = getModeBadgeInfo(s.mode);
+        const submittedCount = Object.keys(s.valuations || {}).length;
+        const totalParticipants = (s.participants || []).length;
+
+        return `
+          <div onclick="selectSession('${s.sessionId}')"
+               class="p-3.5 rounded-xl border transition cursor-pointer ${
+                 isActive
+                   ? 'border-indigo-600 bg-indigo-50/70 shadow-xs'
+                   : 'border-slate-200 hover:border-indigo-300 bg-white'
+               }">
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md ${modeBadge.bgClass}">
+                ${modeBadge.icon} ${modeBadge.label}
+              </span>
+              <span class="text-[11px] text-slate-400 font-mono">${s.sessionId}</span>
+            </div>
+            <h3 class="text-sm font-bold text-slate-800 line-clamp-1">${escapeHtml(s.title)}</h3>
+            <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+              <span>👥 ${submittedCount}/${totalParticipants} คนส่งคะแนนแล้ว</span>
+              <span class="${s.allocation ? 'text-emerald-600 font-semibold' : 'text-amber-600'}">
+                ${s.allocation ? '✓ คำนวณแล้ว' : '• รอคำนวณ'}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectSession(sessionId) {
+      appState.activeSessionId = sessionId;
+      syncSelectedParticipantAndScores();
+      renderAll();
+    }
+
+    function switchTab(tabName) {
+      appState.activeTab = tabName;
+      renderWorkspace();
+    }
+
+    function getModeBadgeInfo(mode) {
+      if (mode === 'CHORES') {
+        return { icon: '🧹', label: 'แบ่งภาระงาน/เวร', bgClass: 'bg-amber-100 text-amber-800' };
+      }
+      if (mode === 'RENT') {
+        return { icon: '🏠', label: 'แบ่งห้อง & หารค่าเช่า', bgClass: 'bg-emerald-100 text-emerald-800' };
+      }
+      return { icon: '🎁', label: 'แบ่งสิ่งของ/ทรัพย์สิน', bgClass: 'bg-indigo-100 text-indigo-800' };
+    }
+
+    function getValuationTypeLabel(vType, mode) {
+      if (vType === 'POINTS_100') return '🎯 กระจายคะแนนรวม 100 แต้ม';
+      if (vType === 'RATING_10') return mode === 'CHORES' ? '⭐ ระดับความเหนื่อย (0 - 10)' : '⭐ ระดับความชอบ (0 - 10)';
+      return '฿ ประเมินมูลค่าเป็นเงิน (บาท)';
+    }
+
+    function renderWorkspace() {
+      const container = document.getElementById('workspaceColumn');
+      const s = getActiveSession();
+
+      if (!s) {
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl border border-slate-200 p-12 text-center card-shadow">
+            <div class="text-4xl mb-3">⚖️</div>
+            <h2 class="text-lg font-bold text-slate-800">ยังไม่มีรายการที่เลือก</h2>
+            <p class="text-sm text-slate-500 mt-1 mb-4">เลือกรายการทางซ้ายมือ หรือสร้างรายการแบ่งสรรใหม่เพื่อเริ่มต้น</p>
+            <button onclick="openCreateModal()" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold">
+              ＋ สร้างรายการแบ่งสรรใหม่
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const modeBadge = getModeBadgeInfo(s.mode);
+      const valTypeLabel = getValuationTypeLabel(s.valuationType, s.mode);
+      const submittedCount = Object.keys(s.valuations || {}).length;
+
+      container.innerHTML = `
+        <!-- Session Header Card -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 card-shadow p-5">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-md ${modeBadge.bgClass}">
+                  ${modeBadge.icon} ${modeBadge.label}
+                </span>
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700">
+                  ${valTypeLabel}
+                </span>
+                ${s.mode === 'RENT' && s.totalCost > 0 ? `
+                  <span class="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    💰 ยอดรวม: ${Number(s.totalCost).toLocaleString()} บาท
+                  </span>
+                ` : ''}
+              </div>
+              <h2 class="text-xl font-bold text-slate-900">${escapeHtml(s.title)}</h2>
+              <p class="text-xs text-slate-500 mt-0.5">${escapeHtml(s.description || 'ไม่มีคำอธิบายเพิ่มเติม')}</p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="triggerComputeNow()"
+                      class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition cursor-pointer">
+                ⚡ คำนวณผลลัพธ์ใหม่
+              </button>
+              <button onclick="confirmDeleteSession('${s.sessionId}')"
+                      title="ลบรายการนี้"
+                      class="p-2 rounded-xl border border-slate-200 hover:bg-rose-50 hover:border-rose-200 text-slate-400 hover:text-rose-600 text-xs transition cursor-pointer">
+                🗑️
+              </button>
+            </div>
+          </div>
+
+          <!-- Navigation Tabs -->
+          <div class="mt-5 pt-3 border-t border-slate-100 flex flex-wrap gap-2">
+            <button onclick="switchTab('RESULT')"
+                    class="px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                      appState.activeTab === 'RESULT'
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }">
+              🏆 1. ผลลัพธ์การจัดสรร & พิสูจน์ความยุติธรรม
+            </button>
+            <button onclick="switchTab('BALLOT')"
+                    class="px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                      appState.activeTab === 'BALLOT'
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }">
+              ✍️ 2. กรอกคะแนนความพึงพอใจ (${submittedCount}/${s.participants.length})
+            </button>
+            <button onclick="switchTab('THEORY')"
+                    class="px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                      appState.activeTab === 'THEORY'
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }">
+              📖 3. อธิบายทฤษฎีและอัลกอริทึม
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab Content Container -->
+        <div id="tabBodyContainer">
+          ${appState.activeTab === 'BALLOT' ? renderBallotTab(s) : ''}
+          ${appState.activeTab === 'RESULT' ? renderResultTab(s) : ''}
+          ${appState.activeTab === 'THEORY' ? renderTheoryTab(s) : ''}
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // TAB 1: BALLOT & PREFERENCES INPUT
+    // =========================================================================
+    function renderBallotTab(s) {
+      const pList = s.participants || [];
+      const curP = appState.selectedParticipant;
+
+      let totalDraft = 0;
+      s.items.forEach(it => {
+        totalDraft += Number(appState.draftScores[it.id] || 0);
+      });
+      totalDraft = Number(totalDraft.toFixed(2));
+
+      const isPoints100 = s.valuationType === 'POINTS_100';
+      const isRating10 = s.valuationType === 'RATING_10';
+      const isMonetary = s.valuationType === 'MONETARY';
+
+      const pointDiff = Number((100 - totalDraft).toFixed(2));
+      const budgetOk = !isPoints100 || Math.abs(pointDiff) < 0.05;
+
+      return `
+        <div class="space-y-5">
+          <!-- Participant Selector & Ballot Card -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 card-shadow p-5">
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
+              <div>
+                <h3 class="text-base font-bold text-slate-800">
+                  ✍️ เลือกชื่อผู้เข้าร่วมเพื่อกรอกคะแนนความพึงพอใจ
+                </h3>
+                <p class="text-xs text-slate-500">
+                  ${s.mode === 'CHORES'
+                    ? 'ให้คะแนนตาม "ความเหนื่อย/ความไม่อยากทำ" (คะแนนสูง = งานหนักมาก ระบบจะช่วยเลี่ยงหรือเกลี่ยให้สมดุล)'
+                    : s.mode === 'RENT'
+                    ? 'ประเมินความคุ้มค่าหรือราคาที่คุณยอมจ่ายสำหรับแต่ละห้องพัก'
+                    : 'ให้คะแนนตามความต้องการของคุณ (คะแนนสูง = อยากได้มาก)'}
+                </p>
+              </div>
+
+              <!-- Participant Pills -->
+              <div class="flex flex-wrap gap-1.5">
+                ${pList.map(p => {
+                  const hasSub = !!(s.valuations && s.valuations[p]);
+                  const active = p === curP;
+                  return `
+                    <button onclick="changeParticipant('${escapeAttr(p)}')"
+                            class="px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition cursor-pointer flex items-center gap-1.5 ${
+                              active
+                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                                : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300'
+                            }">
+                      <span>${hasSub ? '✅' : '⏳'}</span>
+                      <span>${escapeHtml(p)}</span>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <!-- Budget Status Bar -->
+            <div class="my-4 p-3.5 rounded-xl ${
+              budgetOk ? 'bg-indigo-50/70 border border-indigo-100' : 'bg-amber-50 border border-amber-200'
+            } flex flex-wrap items-center justify-between gap-3">
+              <div class="text-xs">
+                <span class="font-bold text-slate-800">ผู้กรอกข้อมูลปัจจุบัน: <span class="text-indigo-700">${escapeHtml(curP)}</span></span>
+                <span class="mx-2 text-slate-300">|</span>
+                <span>ผลรวมคะแนนที่ให้: <b id="liveTotalDisplay" class="text-sm">${totalDraft.toLocaleString()}</b>
+                  ${isPoints100 ? '/ 100 แต้ม' : isMonetary ? 'บาท' : 'คะแนน'}
+                </span>
+                ${isPoints100 ? `
+                  <span id="liveDiffBadge" class="ml-2 px-2 py-0.5 rounded-md font-semibold ${
+                    budgetOk ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-200 text-amber-900'
+                  }">
+                    ${budgetOk ? '✓ ครบ 100 แต้มพอดี' : (pointDiff > 0 ? 'เหลืออีก ' + pointDiff + ' แต้ม' : 'เกินมา ' + Math.abs(pointDiff) + ' แต้ม')}
+                  </span>
+                ` : ''}
+              </div>
+
+              <div class="flex items-center gap-2">
+                ${isPoints100 ? `
+                  <button onclick="normalizeDraftToTarget(100)"
+                          class="px-3 py-1.5 rounded-lg bg-white border border-indigo-200 hover:bg-indigo-50 text-indigo-700 text-xs font-semibold cursor-pointer">
+                    🪄 ปรับสัดส่วนให้ครบ 100 แต้มอัตโนมัติ
+                  </button>
+                ` : ''}
+                ${s.mode === 'RENT' && s.totalCost > 0 ? `
+                  <button onclick="normalizeDraftToTarget(${s.totalCost})"
+                          class="px-3 py-1.5 rounded-lg bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 text-xs font-semibold cursor-pointer">
+                    🪄 ปรับผลรวมให้เท่ากับค่าเช่ารวม (${s.totalCost.toLocaleString()} ฿)
+                  </button>
+                ` : ''}
+                <button onclick="distributeEquallyDraft()"
+                        class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-medium cursor-pointer">
+                  ⚖️ เกลี่ยเท่ากันทุกรายการ
+                </button>
+              </div>
+            </div>
+
+            <!-- Items Scoring Inputs -->
+            <div class="space-y-3">
+              ${s.items.map((it, idx) => {
+                const val = Number(appState.draftScores[it.id] !== undefined ? appState.draftScores[it.id] : 0);
+                const maxSlider = isPoints100 ? 100 : isRating10 ? 10 : Math.max(20000, s.totalCost || 10000);
+                const stepSlider = isRating10 ? 1 : isPoints100 ? 1 : 100;
+
+                return `
+                  <div class="p-3.5 rounded-xl border border-slate-200/90 hover:border-indigo-200 bg-slate-50/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="sm:w-5/12">
+                      <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center">
+                          ${idx + 1}
+                        </span>
+                        <span class="font-semibold text-sm text-slate-800">${escapeHtml(it.name)}</span>
+                      </div>
+                      ${it.desc ? `<p class="text-xs text-slate-500 ml-8 mt-0.5">${escapeHtml(it.desc)}</p>` : ''}
+                    </div>
+
+                    <div class="sm:w-7/12 flex items-center gap-3">
+                      <input type="range"
+                             min="0" max="${maxSlider}" step="${stepSlider}"
+                             value="${val}"
+                             id="slider_${it.id}"
+                             oninput="updateDraftScore('${it.id}', this.value)"
+                             class="flex-1 h-2 bg-slate-200 rounded-lg cursor-pointer">
+                      <div class="flex items-center gap-1">
+                        <input type="number"
+                               min="0" max="${isRating10 ? 10 : 9999999}" step="${isRating10 ? 0.5 : 1}"
+                               value="${val}"
+                               id="num_${it.id}"
+                               oninput="updateDraftScore('${it.id}', this.value)"
+                               class="w-24 px-2.5 py-1.5 rounded-lg border border-slate-300 text-right font-bold text-sm text-indigo-900 bg-white">
+                        <span class="text-xs text-slate-500 w-10">
+                          ${isPoints100 ? 'แต้ม' : isRating10 ? '/ 10' : 'บาท'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <!-- Save & Compute Button -->
+            <div class="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+              <p class="text-xs text-slate-500">
+                * แม้ใช้โหมดคะแนน 0-10 หรือเงินบาท ระบบจะคำนวณสัดส่วนสัมพัทธ์ (Normalized 100%) เพื่อป้องกันการทุ่มคะแนนเอาเปรียบเพื่อนโดยอัตโนมัติ
+              </p>
+              <button onclick="saveCurrentParticipantValuation()"
+                      class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow transition cursor-pointer">
+                💾 บันทึกคะแนนของ "${escapeHtml(curP)}" และคำนวณผลลัพธ์
+              </button>
+            </div>
+          </div>
+
+          <!-- Valuation Overview Matrix Table -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 card-shadow p-5">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h4 class="text-sm font-bold text-slate-800">📊 ตารางสรุปคะแนนความพึงพอใจของทุกคน (Preference Matrix)</h4>
+                <p class="text-xs text-slate-500">เปรียบเทียบคะแนนดิบที่แต่ละคนให้กับแต่ละรายการ</p>
+              </div>
+              <button onclick="toggleBlindMode()"
+                      class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer">
+                ${appState.blindMode ? '👁️ แสดงคะแนนทุกคน' : '🔒 ซ่อนคะแนน (Secret Ballot)'}
+              </button>
+            </div>
+
+            ${appState.blindMode ? `
+              <div class="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 text-xs text-slate-500">
+                🔒 เปิดโหมดลงคะแนนแบบลับ (Secret Ballot) อยู่ เพื่อไม่ให้ผู้เข้าร่วมคนถัดไปเห็นคะแนนของคนก่อนหน้า
+              </div>
+            ` : `
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                      <th class="p-2.5 font-bold">รายการ</th>
+                      ${pList.map(p => `<th class="p-2.5 font-bold text-center">${escapeHtml(p)}</th>`).join('')}
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    ${s.items.map(it => `
+                      <tr class="hover:bg-slate-50">
+                        <td class="p-2.5 font-medium text-slate-800">${escapeHtml(it.name)}</td>
+                        ${pList.map(p => {
+                          const sc = (s.valuations && s.valuations[p] && s.valuations[p].scores && s.valuations[p].scores[it.id] !== undefined)
+                            ? Number(s.valuations[p].scores[it.id]).toLocaleString()
+                            : '<span class="text-slate-300">-</span>';
+                          return `<td class="p-2.5 text-center font-mono">${sc}</td>`;
+                        }).join('')}
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            `}
+          </div>
+        </div>
+      `;
+    }
+
+    function changeParticipant(pName) {
+      appState.selectedParticipant = pName;
+      const s = getActiveSession();
+      if (s) loadDraftScoresForParticipant(s, pName);
+      renderWorkspace();
+    }
+
+    function toggleBlindMode() {
+      appState.blindMode = !appState.blindMode;
+      renderWorkspace();
+    }
+
+    function updateDraftScore(itemId, value) {
+      const s = getActiveSession();
+      if (!s) return;
+      const numVal = Math.max(0, Number(value || 0));
+      appState.draftScores[itemId] = numVal;
+
+      const slider = document.getElementById('slider_' + itemId);
+      const numInput = document.getElementById('num_' + itemId);
+      if (slider && document.activeElement !== slider) slider.value = numVal;
+      if (numInput && document.activeElement !== numInput) numInput.value = numVal;
+
+      let sum = 0;
+      s.items.forEach(it => sum += Number(appState.draftScores[it.id] || 0));
+      sum = Number(sum.toFixed(2));
+
+      const totalEl = document.getElementById('liveTotalDisplay');
+      if (totalEl) totalEl.textContent = sum.toLocaleString();
+
+      if (s.valuationType === 'POINTS_100') {
+        const diff = Number((100 - sum).toFixed(2));
+        const badge = document.getElementById('liveDiffBadge');
+        if (badge) {
+          if (Math.abs(diff) < 0.05) {
+            badge.className = 'ml-2 px-2 py-0.5 rounded-md font-semibold bg-emerald-100 text-emerald-700';
+            badge.textContent = '✓ ครบ 100 แต้มพอดี';
+          } else {
+            badge.className = 'ml-2 px-2 py-0.5 rounded-md font-semibold bg-amber-200 text-amber-900';
+            badge.textContent = diff > 0 ? ('เหลืออีก ' + diff + ' แต้ม') : ('เกินมา ' + Math.abs(diff) + ' แต้ม');
+          }
+        }
+      }
+    }
+
+    function normalizeDraftToTarget(targetSum) {
+      const s = getActiveSession();
+      if (!s) return;
+      let curSum = 0;
+      s.items.forEach(it => curSum += Number(appState.draftScores[it.id] || 0));
+
+      const m = s.items.length || 1;
+      if (curSum <= 0) {
+        distributeEquallyDraft();
+        return;
+      }
+
+      let running = 0;
+      s.items.forEach((it, idx) => {
+        if (idx === m - 1) {
+          appState.draftScores[it.id] = Math.max(0, Math.round(targetSum - running));
+        } else {
+          const scaled = Math.round((Number(appState.draftScores[it.id] || 0) / curSum) * targetSum);
+          appState.draftScores[it.id] = scaled;
+          running += scaled;
+        }
+      });
+      renderWorkspace();
+    }
+
+    function distributeEquallyDraft() {
+      const s = getActiveSession();
+      if (!s) return;
+      const m = s.items.length || 1;
+      const target = s.valuationType === 'POINTS_100'
+        ? 100
+        : (s.mode === 'RENT' && s.totalCost > 0 ? s.totalCost : m * 5);
+
+      const base = Math.floor(target / m);
+      const rem = target - base * m;
+      s.items.forEach((it, idx) => {
+        appState.draftScores[it.id] = base + (idx < rem ? 1 : 0);
+      });
+      renderWorkspace();
+    }
+
+    function saveCurrentParticipantValuation() {
+      const s = getActiveSession();
+      if (!s) return;
+
+      if (s.valuationType === 'POINTS_100') {
+        let sum = 0;
+        s.items.forEach(it => sum += Number(appState.draftScores[it.id] || 0));
+        if (Math.abs(sum - 100) > 0.5) {
+          const confirmAuto = confirm(
+            `คะแนนรวมของคุณคือ ${sum} แต้ม (กติกาคือ 100 แต้ม)\nต้องการให้ระบบปรับสัดส่วนเป็น 100 แต้มอัตโนมัติก่อนบันทึกหรือไม่?`
+          );
+          if (confirmAuto) {
+            normalizeDraftToTarget(100);
+          } else {
+            return;
+          }
+        }
+      }
+
+      showLoading('กำลังบันทึกคะแนนและคำนวณการจัดสรรที่ยุติธรรมที่สุด...');
+      google.script.run
+        .withSuccessHandler(data => {
+          hideLoading();
+          appState.activeTab = 'RESULT';
+          applyAppData(data, s.sessionId);
+          showToast('บันทึกคะแนนและอัปเดตผลลัพธ์เรียบร้อย!');
+        })
+        .withFailureHandler(err => {
+          hideLoading();
+          alert('บันทึกไม่สำเร็จ: ' + (err.message || err));
+        })
+        .apiSubmitValuation(s.sessionId, appState.selectedParticipant, appState.draftScores, true);
+    }
+
+    // =========================================================================
+    // TAB 2: ALLOCATION RESULTS & FAIRNESS AUDIT
+    // =========================================================================
+    function renderResultTab(s) {
+      if (!s.allocation || !s.allocation.result) {
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 p-10 text-center card-shadow">
+            <div class="text-3xl mb-2">🧮</div>
+            <h3 class="text-base font-bold text-slate-800">พร้อมคำนวณผลลัพธ์การจัดสรร</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-4">กดปุ่มด้านล่างเพื่อรันอัลกอริทึม Fair Division ทันที</p>
+            <button onclick="triggerComputeNow()" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold">
+              ⚡ คำนวณผลลัพธ์ทันที
+            </button>
+          </div>
+        `;
+      }
+
+      const res = s.allocation.result;
+      const metrics = s.allocation.fairnessMetrics || {};
+      const allocations = res.allocations || [];
+      const isRent = s.mode === 'RENT';
+      const isChores = s.mode === 'CHORES';
+
+      return `
+        <div class="space-y-5">
+
+          <!-- Algorithm Selector & Fairness Score Banner -->
+          <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 text-white rounded-2xl p-5 card-shadow">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div class="max-w-2xl">
+                <div class="flex items-center gap-2 text-xs text-indigo-200 font-semibold uppercase tracking-wider">
+                  <span>⚙️ อัลกอริทึมที่ใช้จัดสรร</span>
+                  <span class="px-2 py-0.5 rounded bg-white/15 text-white font-mono">${res.algorithmCode}</span>
+                </div>
+                <h3 class="text-lg font-bold mt-1">${escapeHtml(res.algorithmTitle || '')}</h3>
+                <p class="text-xs text-indigo-100/90 mt-1 leading-relaxed">${escapeHtml(res.algorithmDescription || '')}</p>
+              </div>
+
+              <!-- Switch Algorithm Dropdown (for Goods) -->
+              ${s.mode === 'GOODS' ? `
+                <div class="bg-white/10 backdrop-blur p-3 rounded-xl border border-white/15">
+                  <label class="block text-[11px] text-indigo-200 font-semibold mb-1">เปลี่ยนอัลกอริทึมเปรียบเทียบ:</label>
+                  <select onchange="triggerComputeWithAlgo(this.value)"
+                          class="bg-slate-900/90 text-white text-xs px-3 py-1.5 rounded-lg border border-indigo-400/40 focus:outline-none">
+                    <option value="MNW_EF1" ${res.algorithmCode === 'MNW_EF1' ? 'selected' : ''}>Maximum Nash Welfare (MNW + EF1)</option>
+                    ${s.participants.length === 2 ? `
+                      <option value="ADJUSTED_WINNER" ${res.algorithmCode === 'ADJUSTED_WINNER' ? 'selected' : ''}>Adjusted Winner (สำหรับ 2 คน)</option>
+                    ` : ''}
+                    <option value="ROUND_ROBIN" ${res.algorithmCode === 'ROUND_ROBIN' ? 'selected' : ''}>Round-Robin Draft (EF1)</option>
+                  </select>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Fairness Criteria Badges -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mt-4 pt-4 border-t border-white/15">
+              ${(metrics.summaryBadges || []).map(b => `
+                <div class="bg-white/10 rounded-xl p-3 border border-white/10">
+                  <div class="flex items-center gap-1.5 text-xs font-bold ${b.passed ? 'text-emerald-300' : 'text-amber-300'}">
+                    <span>${b.passed ? '✅' : 'ℹ️'}</span>
+                    <span>${escapeHtml(b.label)}</span>
+                  </div>
+                  <p class="text-[11px] text-indigo-100/85 mt-1 leading-snug">${escapeHtml(b.desc)}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Adjusted Winner Split Note (if applicable) -->
+          ${res.splitNote ? `
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-900 flex items-start gap-3">
+              <span class="text-xl">⚖️</span>
+              <div>
+                <b class="text-sm">คำแนะนำเพิ่มเติมจาก Adjusted Winner (กรณีต้องการความเท่าเทียม 100% เป๊ะ):</b>
+                <p class="mt-0.5 leading-relaxed">
+                  รายการที่จุดตัดคือ <b>"${escapeHtml(res.splitNote.itemName)}"</b> — หากเป็นทรัพย์สินที่แบ่งสัดส่วนหรือชดเชยเป็นเงินได้
+                  การแบ่งให้ <b>${escapeHtml(res.splitNote.highParticipant)} (${res.splitNote.shareHighPct}%)</b> และ
+                  <b>${escapeHtml(res.splitNote.lowParticipant)} (${res.splitNote.shareLowPct}%)</b>
+                  จะทำให้ทั้งสองฝ่ายได้ระดับความพึงพอใจเท่ากันที่ <b>${res.splitNote.equitableScore}%</b> พอดี!
+                </p>
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Participant Allocation Cards -->
+          <div>
+            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">
+              🎯 สรุปผลการจัดสรรรายบุคคล (Individual Allocation)
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              ${allocations.map((alloc, idx) => {
+                const itemsHtml = (alloc.assignedItems || []).length > 0
+                  ? alloc.assignedItems.map(item => `
+                      <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2">
+                        <div>
+                          <div class="text-xs font-bold text-slate-800">${escapeHtml(item.name)}</div>
+                          ${item.desc ? `<div class="text-[11px] text-slate-500">${escapeHtml(item.desc)}</div>` : ''}
+                        </div>
+                        <div class="text-right shrink-0">
+                          ${isRent ? `
+                            <div class="text-xs font-bold text-emerald-700">จ่าย ${Number(item.price).toLocaleString()} ฿</div>
+                            <div class="text-[10px] text-slate-500">ประเมินไว้ ${Number(item.normScore).toLocaleString()} ฿</div>
+                          ` : `
+                            <div class="text-xs font-bold text-indigo-700">${item.normScore}%</div>
+                            <div class="text-[10px] text-slate-400">(คะแนนดิบ ${item.rawScore})</div>
+                          `}
+                        </div>
+                      </div>
+                    `).join('')
+                  : `<div class="p-4 text-center text-xs text-slate-400 bg-slate-50 rounded-xl">ไม่ได้รับรายการในรอบนี้</div>`;
+
+                return `
+                  <div class="bg-white rounded-2xl border border-slate-200/90 card-shadow p-4 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                          <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">
+                            ${idx + 1}
+                          </div>
+                          <div>
+                            <h4 class="font-bold text-sm text-slate-900">${escapeHtml(alloc.participant)}</h4>
+                            <span class="text-[11px] text-slate-400">
+                              ${isRent ? 'ได้รับจัดสรร 1 ห้องพัก' : ('ได้รับ ' + (alloc.assignedItems || []).length + ' รายการ')}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div class="text-right">
+                          ${isRent ? `
+                            <div class="text-sm font-extrabold text-emerald-700">${Number(alloc.priceToPay).toLocaleString()} ฿</div>
+                            <div class="text-[11px] ${alloc.surplus >= 0 ? 'text-emerald-600' : 'text-amber-600'} font-medium">
+                              คุ้มค่า +${Number(alloc.surplus).toLocaleString()} ฿
+                            </div>
+                          ` : `
+                            <div class="text-sm font-extrabold ${isChores ? 'text-amber-700' : 'text-indigo-700'}">
+                              ${alloc.totalNormScore}%
+                            </div>
+                            <div class="text-[10px] text-slate-500">
+                              ${isChores ? 'สัดส่วนภาระงาน' : 'สัดส่วนความพึงพอใจ'}
+                            </div>
+                          `}
+                        </div>
+                      </div>
+
+                      <div class="space-y-2">
+                        ${itemsHtml}
+                      </div>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div class="mt-4 pt-3 border-t border-slate-100">
+                      ${isRent ? `
+                        <div class="flex justify-between text-[11px] text-slate-500">
+                          <span>ราคาประเมินในใจ: <b>${Number(alloc.totalNormScore).toLocaleString()} ฿</b></span>
+                          <span>ค่าเช่าจริง: <b>${Number(alloc.priceToPay).toLocaleString()} ฿</b></span>
+                        </div>
+                      ` : `
+                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                          <div class="${isChores ? 'bg-amber-500' : 'bg-indigo-600'} h-full rounded-full"
+                               style="width: ${Math.min(100, Math.round(alloc.totalNormScore))}%"></div>
+                        </div>
+                        <div class="flex justify-between text-[11px] text-slate-500 mt-1">
+                          <span>เกณฑ์มาตรฐาน (1/${allocations.length}): <b>${(100 / allocations.length).toFixed(1)}%</b></span>
+                          <span>คะแนนดิบรวม: <b>${alloc.totalRawScore}</b></span>
+                        </div>
+                      `}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- Envy Audit Matrix Table -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 card-shadow p-5">
+            <h3 class="text-sm font-bold text-slate-800 mb-1">
+              🔍 ตารางพิสูจน์ความไม่อิจฉา (Envy-Freeness Audit Matrix)
+            </h3>
+            <p class="text-xs text-slate-500 mb-4">
+              ${isRent
+                ? 'แสดง "ส่วนเกินความคุ้มค่าสุทธิ (ราคาที่ประเมินห้องนั้น - ราคาค่าเช่าห้องนั้น)" ในมุมมองของแต่ละคน หากเลือกห้องของตัวเองเทียบกับห้องของเพื่อน'
+                : isChores
+                ? 'แสดงว่าในมุมมองของคนแถวซ้าย มองว่า "เวรของตัวเอง" เหนื่อยกี่ % เทียบกับ "เวรที่คนอื่นได้รับ" (ยิ่งเวรตัวเองเหนื่อยน้อยกว่าหรือใกล้เคียงกัน = ไม่เกิดความอิจฉา)'
+                : 'แสดงว่าในมุมมองของคนแถวซ้าย มองว่า "ของที่ตัวเองได้รับ" มีคุณค่ากี่ % เทียบกับ "ของที่คนอื่นได้รับ"'}
+            </p>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                    <th class="p-3 text-left font-bold">มุมมองของผู้สังเกต (Observer)</th>
+                    ${(s.participants || []).map(p => `
+                      <th class="p-3 text-center font-bold">เมื่อมองชุดของ "${escapeHtml(p)}"</th>
+                    `).join('')}
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${(metrics.envyMatrix || []).map((row, rIdx) => `
+                    <tr class="hover:bg-slate-50/80">
+                      <td class="p-3 font-bold text-slate-800">
+                        👁️ ${escapeHtml(row.observer)}
+                      </td>
+                      ${(row.comparisons || []).map((comp, cIdx) => {
+                        const isSelf = rIdx === cIdx;
+                        if (isRent) {
+                          return `
+                            <td class="p-3 text-center ${isSelf ? 'bg-emerald-50/80 font-bold text-emerald-900 border-x border-emerald-100' : ''}">
+                              <div>ส่วนต่างคุ้มค่า: <b>${comp.netSurplus >= 0 ? '+' : ''}${comp.netSurplus} ฿</b></div>
+                              <div class="text-[10px] text-slate-400">
+                                (ประเมิน ${comp.myValuation.toLocaleString()} - จ่าย ${comp.roomPrice.toLocaleString()})
+                              </div>
+                              ${isSelf ? `<span class="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-200 text-emerald-900">ห้องที่ได้</span>` : ''}
+                            </td>
+                          `;
+                        }
+                        return `
+                          <td class="p-3 text-center ${isSelf ? 'bg-indigo-50/70 font-bold text-indigo-900 border-x border-indigo-100' : ''}">
+                            <div class="text-sm font-mono">${comp.myValuationPct}%</div>
+                            ${isSelf ? `
+                              <span class="inline-block mt-0.5 text-[10px] px-2 py-0.5 rounded-full bg-indigo-200 text-indigo-900 font-semibold">
+                                ชุดของตัวเอง
+                              </span>
+                            ` : comp.isEnvious ? `
+                              <span class="inline-block mt-0.5 text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-medium">
+                                ${comp.isEF1 ? '✓ ผ่านเกณฑ์ EF1 (ต่างไม่เกิน 1 ชิ้น)' : '⚠️ มีความต่าง'}
+                              </span>
+                            ` : `
+                              <span class="inline-block mt-0.5 text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-medium">
+                                ✓ ไม่มีความอิจฉา
+                              </span>
+                            `}
+                          </td>
+                        `;
+                      }).join('')}
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // TAB 3: THEORY GUIDE
+    // =========================================================================
+    function renderTheoryTab() {
+      return `
+        <div class="bg-white rounded-2xl border border-slate-200/80 card-shadow p-6 space-y-6 text-sm text-slate-700 leading-relaxed">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">📖 คู่มือทฤษฎีการจัดสรรอย่างยุติธรรม (Fair Division Theory)</h3>
+            <p class="text-xs text-slate-500 mt-0.5">
+              หลักการทางคณิตศาสตร์และเศรษฐศาสตร์ที่อยู่เบื้องหลังการคำนวณของแอปพลิเคชันนี้
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 rounded-xl bg-indigo-50/60 border border-indigo-100">
+              <div class="font-bold text-indigo-950 mb-1">1. Maximum Nash Welfare (MNW)</div>
+              <p class="text-xs text-slate-600">
+                ค้นหาการจัดสรรที่ทำให้ผลคูณความพึงพอใจของทุกคน ($\prod_i u_i(A_i)$) สูงที่สุด
+                ทฤษฎีบทของ <i>Caragiannis et al. (2019)</i> พิสูจน์ว่าผลลัพธ์จาก MNW จะเป็นทั้ง
+                <b>EF1 (Envy-Free up to 1 item)</b> และ <b>Pareto Optimal</b> เสมอ
+              </p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-amber-50/60 border border-amber-100">
+              <div class="font-bold text-amber-950 mb-1">2. Adjusted Winner & EF1 Chores</div>
+              <p class="text-xs text-slate-600">
+                สำหรับ 2 คน อัลกอริทึม <i>Adjusted Winner (Brams & Taylor)</i> จะจัดของให้ผู้ที่ให้ค่าสูงกว่าก่อน
+                แล้วโอนย้ายชิ้นที่อัตราส่วนคะแนนใกล้เคียงกันที่สุดจนกว่าทั้งสองฝ่ายจะได้ความพึงพอใจเท่ากันพอดี
+              </p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-100">
+              <div class="font-bold text-emerald-950 mb-1">3. Envy-Free Rent Division</div>
+              <p class="text-xs text-slate-600">
+                สำหรับการแบ่งห้องและหารค่าเช่า อัลกอริทึมจะจับคู่ห้องที่ทำให้มูลค่ารวมสูงสุดก่อน
+                จากนั้นคำนวณราคาค่าเช่าแต่ละห้องให้ทุกคนได้รับ <b>ส่วนเกินความคุ้มค่า (Surplus)</b> เท่าเทียมกันและไม่มีใครอยากสลับห้อง
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // Actions: Compute, Create, Delete, Reset Demo
+    // =========================================================================
+    function triggerComputeNow() {
+      const s = getActiveSession();
+      if (!s) return;
+      triggerComputeWithAlgo(null);
+    }
+
+    function triggerComputeWithAlgo(algoOverride) {
+      const s = getActiveSession();
+      if (!s) return;
+      showLoading('กำลังประมวลผลด้วยอัลกอริทึม Fair Division...');
+      google.script.run
+        .withSuccessHandler(res => {
+          hideLoading();
+          appState.activeTab = 'RESULT';
+          applyAppData(res.appData, s.sessionId);
+          showToast('คำนวณผลลัพธ์การจัดสรรเรียบร้อยแล้ว!');
+        })
+        .withFailureHandler(err => {
+          hideLoading();
+          alert('คำนวณไม่สำเร็จ: ' + (err.message || err));
+        })
+        .apiComputeFairDivision(s.sessionId, algoOverride);
+    }
+
+    function openCreateModal() {
+      selectNewMode('GOODS');
+      document.getElementById('createModal').classList.remove('hidden');
+      document.getElementById('createModal').classList.add('flex');
+    }
+
+    function closeCreateModal() {
+      document.getElementById('createModal').classList.add('hidden');
+      document.getElementById('createModal').classList.remove('flex');
+    }
+
+    function selectNewMode(mode) {
+      appState.newModalMode = mode;
+      ['GOODS', 'CHORES', 'RENT'].forEach(m => {
+        const btn = document.getElementById('modeBtn_' + m);
+        if (m === mode) {
+          btn.className = 'p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/60 text-left transition';
+        } else {
+          btn.className = 'p-3 rounded-xl border-2 border-slate-200 hover:border-slate-300 text-left transition';
+        }
+      });
+
+      const costWrap = document.getElementById('newTotalCostWrap');
+      const valSelect = document.getElementById('newValuationType');
+      const itemsLabel = document.getElementById('newItemsLabel');
+      const itemsArea = document.getElementById('newItems');
+
+      if (mode === 'RENT') {
+        costWrap.classList.remove('hidden');
+        valSelect.value = 'MONETARY';
+        itemsLabel.textContent = 'รายการห้องพัก (จำนวนบรรทัดต้องเท่ากับจำนวนผู้เข้าร่วมพอดี) *';
+        itemsArea.value = 'ห้องนอนใหญ่ (Master Room) : มีห้องน้ำในตัวและระเบียง\nห้องนอนกลาง (Standard Room) : หน้าต่างวิวสวน\nห้องนอนเล็ก (Cozy Room) : เงียบสงบ';
+      } else if (mode === 'CHORES') {
+        costWrap.classList.add('hidden');
+        valSelect.value = 'RATING_10';
+        itemsLabel.textContent = 'รายการภาระงาน / เวรทำความสะอาด (บรรทัดละ 1 งาน) *';
+        itemsArea.value = 'ล้างห้องน้ำ : สัปดาห์ละ 1 ครั้ง\nล้างจานและเช็ดโต๊ะอาหาร : ทุกวันหลังมื้อเย็น\nกวาดและถูพื้นห้องนั่งเล่น : สัปดาห์ละ 2 ครั้ง\nแยกขยะและนำไปทิ้ง : วันอังคารและศุกร์';
+      } else {
+        costWrap.classList.add('hidden');
+        valSelect.value = 'POINTS_100';
+        itemsLabel.textContent = 'รายการสิ่งของที่จะแบ่ง (บรรทัดละ 1 รายการ) *';
+        itemsArea.value = 'ไอแพด Gen 10 : สีฟ้า 64GB\nลำโพง Bluetooth Marshall : เสียงเบสแน่น\nหูฟังไร้สาย AirPods : สภาพใหม่\nบัตรของขวัญเซ็นทรัล 3,000 บาท : ใช้ได้ทุกสาขา';
+      }
+    }
+
+    function submitNewSession() {
+      const title = document.getElementById('newTitle').value.trim();
+      const description = document.getElementById('newDesc').value.trim();
+      const valuationType = document.getElementById('newValuationType').value;
+      const totalCost = Number(document.getElementById('newTotalCost').value || 0);
+      const participantsRaw = document.getElementById('newParticipants').value;
+      const itemsRaw = document.getElementById('newItems').value;
+
+      if (!title) {
+        alert('กรุณาระบุชื่อหัวข้อรายการ');
+        return;
+      }
+
+      const participants = participantsRaw
+        .split(/[\n,]+/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      const items = itemsRaw
+        .split(/\n+/)
+        .map((line, idx) => {
+          const parts = line.split(':');
+          return {
+            id: 'item_' + (idx + 1),
+            name: (parts[0] || '').trim(),
+            desc: parts.slice(1).join(':').trim()
+          };
+        })
+        .filter(it => it.name.length > 0);
+
+      if (participants.length < 2) {
+        alert('กรุณาระบุรายชื่อผู้เข้าร่วมอย่างน้อย 2 คน');
+        return;
+      }
+      if (items.length < 1) {
+        alert('กรุณาระบุรายการอย่างน้อย 1 รายการ');
+        return;
+      }
+      if (appState.newModalMode === 'RENT' && items.length !== participants.length) {
+        alert(`สำหรับโหมดแบ่งห้องพัก จำนวนห้อง (${items.length} ห้อง) ต้องเท่ากับจำนวนผู้เข้าร่วม (${participants.length} คน) พอดีครับ`);
+        return;
+      }
+
+      const payload = {
+        title: title,
+        description: description,
+        mode: appState.newModalMode,
+        valuationType: valuationType,
+        totalCost: totalCost,
+        participants: participants,
+        items: items,
+        algorithm: 'AUTO'
+      };
+
+      closeCreateModal();
+      showLoading('กำลังสร้างรายการใหม่ลงใน Google Sheets...');
+      google.script.run
+        .withSuccessHandler(res => {
+          hideLoading();
+          appState.activeTab = 'BALLOT';
+          applyAppData(res.appData, res.created.sessionId);
+          showToast('สร้างรายการใหม่สำเร็จ! เริ่มกรอกคะแนนได้เลย');
+        })
+        .withFailureHandler(err => {
+          hideLoading();
+          alert('ไม่สามารถสร้างรายการได้: ' + (err.message || err));
+        })
+        .apiCreateSession(payload);
+    }
+
+    function confirmDeleteSession(sessionId) {
+      if (!confirm('ต้องการลบรายการแบ่งสรรนี้ออกจาก Google Sheets หรือไม่?')) return;
+      showLoading('กำลังลบรายการ...');
+      google.script.run
+        .withSuccessHandler(data => {
+          hideLoading();
+          applyAppData(data, null);
+          showToast('ลบรายการเรียบร้อยแล้ว', '🗑️');
+        })
+        .withFailureHandler(err => {
+          hideLoading();
+          alert('ลบไม่สำเร็จ: ' + (err.message || err));
+        })
+        .apiDeleteSession(sessionId);
+    }
+
+    function resetDemoData() {
+      if (!confirm('ต้องการสร้างข้อมูลตัวอย่าง (Demo ครบ 3 โหมด) เพิ่มลงในระบบหรือไม่?')) return;
+      showLoading('กำลังสร้างข้อมูลตัวอย่าง 3 โหมด...');
+      google.script.run
+        .withSuccessHandler(data => {
+          hideLoading();
+          applyAppData(data, 'FD-GOODS-01');
+          showToast('สร้างข้อมูลตัวอย่างทั้ง 3 โหมดเรียบร้อยแล้ว!');
+        })
+        .withFailureHandler(err => {
+          hideLoading();
+          alert('เกิดข้อผิดพลาด: ' + (err.message || err));
+        })
+        .apiResetDemoSessions();
+    }
+
+    // =========================================================================
+    // Helpers
+    // =========================================================================
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(str) {
+      return String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
