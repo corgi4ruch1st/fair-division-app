@@ -69,18 +69,25 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- ==================== OPTIONAL SETUP BANNER ==================== -->
+  <!-- ==================== GOOGLE SHEETS SYNC BANNER ==================== -->
   <div id="setupBanner" class="hidden bg-amber-950 text-amber-50 border-b border-amber-800 px-4 py-3.5">
-    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-3">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-3">
       <div class="flex items-center gap-2 text-amber-200 text-xs font-semibold shrink-0">
-        <span>🔗 Google Sheets API URL (ตัวเลือกเสริม):</span>
+        <span>📊 Google Sheets API URL:</span>
       </div>
       <input id="setupUrlInput" type="url" placeholder="https://script.google.com/macros/s/XXXXXX/exec"
              class="flex-1 w-full px-3 py-1.5 rounded-xl border border-amber-700 text-xs bg-amber-900/70 text-white focus:outline-none">
-      <div class="flex items-center gap-2 shrink-0">
+      <div class="flex flex-wrap items-center gap-2 shrink-0">
         <button onclick="saveScriptUrl()" class="px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-amber-950 text-xs font-bold cursor-pointer">
-          💾 บันทึกเชื่อม Sheet
+          💾 บันทึก URL
         </button>
+        <button onclick="syncAllToGoogleSheetsNow()" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-bold cursor-pointer">
+          🔄 ซิงค์ข้อมูลทั้งหมดลง Sheet ทันที
+        </button>
+        <a id="openSheetDirectLink" href="https://script.google.com/home/projects/1gcdIi2tA6p3MXFGVm1kFXOZZGB7cPCAsypJxs8BdQqzxc3H4apl3StJ5" target="_blank"
+           class="px-3.5 py-1.5 rounded-xl bg-violet-500 hover:bg-violet-400 text-white text-xs font-bold">
+          📂 เปิดโปรเจกต์ Sheet / Apps Script
+        </a>
         <button onclick="document.getElementById('setupBanner').classList.add('hidden')" class="px-2.5 py-1.5 rounded-xl bg-amber-800 text-amber-200 text-xs cursor-pointer">
           ปิด ✕
         </button>
@@ -116,6 +123,12 @@
            class="cozy-btn inline-flex items-center gap-1.5 text-xs font-semibold bg-emerald-500 hover:bg-emerald-600 text-white border-2 border-emerald-600 px-3 py-2 cursor-pointer">
           <span>📘 คู่มือ & PDF</span>
         </a>
+
+        <!-- ปุ่มซิงค์และเปิด Google Sheets -->
+        <button onclick="toggleSetupBanner()"
+                class="cozy-btn inline-flex items-center gap-1.5 text-xs font-semibold bg-white/95 hover:bg-white text-emerald-800 border-2 border-emerald-300 px-3 py-2 cursor-pointer">
+          <span>📊 Google Sheets</span>
+        </button>
 
         <!-- ปุ่มติดตั้งแอปลงเครื่อง (PWA Install) -->
         <button id="installAppBtn" onclick="handleInstallClick()"
@@ -1367,8 +1380,23 @@ async function callCloudApiSilent(action, extraPayload = {}) {
 async function trySyncFromCloud() {
   const cloudData = await callCloudApiSilent('getAll');
   const badge = document.getElementById('syncStatusBadge');
-  if (cloudData && Array.isArray(cloudData.sessions) && cloudData.sessions.length > 0) {
-    if (badge) badge.textContent = '☁️ ซิงค์กับ Google Sheets แล้ว';
+  if (cloudData && Array.isArray(cloudData.sessions)) {
+    if (badge) badge.textContent = '☁️ เชื่อมต่อ Google Sheets แล้ว';
+    // ซิงค์ข้อมูลทั้ง 6 โหมดและอัปเดตหน้า Dashboard ใน Google Sheets อัตโนมัติ
+    callCloudApiSilent('syncAllSessions', { sessions: appState.sessions });
+  }
+}
+
+async function syncAllToGoogleSheetsNow() {
+  showToast('กำลังซิงค์ข้อมูลและสร้างตารางสรุปใน Google Sheets...', '☁️');
+  const res = await callCloudApiSilent('syncAllSessions', { sessions: appState.sessions });
+  const badge = document.getElementById('syncStatusBadge');
+  if (res && res.ok) {
+    if (badge) badge.textContent = '☁️ ซิงค์กับ Google Sheets ล่าสุดแล้ว';
+    fireCozyConfetti();
+    showToast(`ซิงค์ข้อมูลทั้ง ${appState.sessions.length} ห้องและอัปเดตหน้า "🏠 ศูนย์รวมและสรุปผล" ใน Google Sheets สำเร็จ!`, '📊');
+  } else {
+    showToast('ส่งคำสั่งซิงค์แล้ว! (หากเพิ่งเปิด Sheet ครั้งแรก กดเมนู ⚖️ Fair Division App ใน Sheet เพื่ออนุญาตสิทธิ์)', '💡');
   }
 }
 
@@ -2028,6 +2056,7 @@ function saveAndPassToNextFriend() {
   };
   computeSessionAllocationClient(s);
   saveLocalSessions();
+  callCloudApiSilent('syncSession', { session: s });
 
   const pList = s.participants || [];
   const curIdx = pList.indexOf(appState.selectedParticipant);
@@ -2054,8 +2083,8 @@ function saveCurrentParticipantValuation() {
   appState.activeTab = 'RESULT';
   renderAll();
   fireCozyConfetti();
-  showToast('บันทึกคะแนนและคำนวณผลลัพธ์เรียบร้อย! 🎉');
-  callCloudApiSilent('submitValuation', { sessionId: s.sessionId, participantName: appState.selectedParticipant, scores: appState.draftScores, autoCompute: true });
+  showToast('บันทึกคะแนนและซิงค์ลง Google Sheets เรียบร้อย! 🎉');
+  callCloudApiSilent('syncSession', { session: s });
 }
 
 function triggerComputeNow() { triggerComputeWithAlgo(null); }
@@ -2066,7 +2095,8 @@ function triggerComputeWithAlgo(algo) {
   appState.activeTab = 'RESULT';
   renderAll();
   fireCozyConfetti();
-  showToast('คำนวณผลลัพธ์ใหม่เรียบร้อย! ✨');
+  showToast('คำนวณผลลัพธ์ใหม่และอัปเดตลง Google Sheets เรียบร้อย! ✨');
+  callCloudApiSilent('syncSession', { session: s });
 }
 
 function openCreateModal(){selectNewMode('GOODS');document.getElementById('createModal').classList.remove('hidden');document.getElementById('createModal').classList.add('flex');}
@@ -2157,8 +2187,8 @@ function submitNewSession() {
   syncSelectedParticipantAndScores();
   renderAll();
   fireCozyConfetti();
-  showToast('สร้างห้องใหม่สำเร็จ! เริ่มหยอดคะแนนได้เลย 🧸');
-  callCloudApiSilent('createSession', { data: newSession });
+  showToast('สร้างห้องใหม่และบันทึกใน Google Sheets สำเร็จ! 🧸');
+  callCloudApiSilent('syncSession', { session: newSession });
 }
 
 function confirmDeleteSession(id) {
@@ -2167,6 +2197,7 @@ function confirmDeleteSession(id) {
   saveLocalSessions();
   applyAppData({ sessions: appState.sessions }, null);
   showToast('ลบห้องเรียบร้อย','🗑️');
+  callCloudApiSilent('deleteSession', { sessionId: id });
 }
 
 function resetDemoData() {
@@ -2176,7 +2207,8 @@ function resetDemoData() {
   saveLocalSessions();
   applyAppData({ sessions: demos }, 'FD-GOODS-01');
   fireCozyConfetti();
-  showToast('โหลดข้อมูลตัวอย่างครบทั้ง 6 โหมดเรียบร้อย!');
+  showToast('โหลดข้อมูลตัวอย่างครบทั้ง 6 โหมดและซิงค์ลง Sheet เรียบร้อย!');
+  callCloudApiSilent('syncAllSessions', { sessions: demos });
 }
 
 function esc(str){return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
