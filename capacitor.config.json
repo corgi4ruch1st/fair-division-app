@@ -1,0 +1,8 @@
+{
+  "appId": "com.fairshare.cozy",
+  "appName": "FairShare Cozy",
+  "webDir": "docs",
+  "server": {
+    "androidScheme": "https"
+  }
+}

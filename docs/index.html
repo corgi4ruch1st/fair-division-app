@@ -196,21 +196,26 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL: PWA INSTALL GUIDE ==================== -->
+  <!-- ==================== MODAL: PWA & APK INSTALL GUIDE ==================== -->
   <div id="installGuideModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
     <div class="bg-[#FFFDF7] rounded-3xl max-w-md w-full p-6 shadow-2xl border-4 border-amber-200">
       <div class="flex items-center justify-between pb-3 border-b border-amber-200">
-        <h3 class="text-base font-bold text-slate-900 font-cute">📲 วิธีติดตั้งแอปลง Notebook และ มือถือ</h3>
+        <h3 class="text-base font-bold text-slate-900 font-cute">📲 ติดตั้งแอปลงมือถือ (.APK) และ Notebook</h3>
         <button onclick="closeInstallGuideModal()" class="text-slate-400 hover:text-slate-600 font-bold px-2 cursor-pointer">✕</button>
       </div>
       <div class="space-y-3.5 mt-4 text-xs text-slate-700 leading-relaxed">
+        <!-- ปุ่มดาวน์โหลดไฟล์ .APK โดยตรง -->
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-300 text-center">
+          <div class="font-bold text-emerald-950 text-sm mb-1 font-cute">🤖 ดาวน์โหลดไฟล์ติดตั้ง Android แท้ (.APK)</div>
+          <p class="text-[11px] text-slate-600 mb-2.5">ติดตั้งเป็นแอป Android แท้ลงเครื่อง (ทำงานได้ทั้ง Offline ในเครื่อง + ซิงค์ Google Sheets)</p>
+          <a href="https://github.com/corgi4ruch1st/fair-division-app/releases/latest/download/FairShare-Cozy.apk"
+             class="cozy-btn inline-flex items-center justify-center gap-1.5 w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold">
+            <span>📥 ดาวน์โหลดไฟล์ FairShare-Cozy.apk</span>
+          </a>
+        </div>
         <div class="p-3.5 rounded-2xl bg-violet-50 border-2 border-violet-200">
           <div class="font-bold text-violet-950 text-sm mb-1">💻 บน Notebook / PC (Google Chrome / Edge)</div>
-          <p>คลิกไอคอน <b>รูปหน้าจอคอมพิวเตอร์พร้อมลูกศรลง 📥</b> ที่ด้านขวาของแถบ URL ด้านบน หรือกดเมนู <b>⋮ (มุมขวาบน)</b> &rarr; <b>"บันทึกและแชร์ (Save and share)"</b> &rarr; <b>"ติดตั้งหน้าเว็บเป็นแอป (Install page as app)"</b></p>
-        </div>
-        <div class="p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-200">
-          <div class="font-bold text-emerald-950 text-sm mb-1">📱 บนมือถือ Android (Google Chrome)</div>
-          <p>กดปุ่มเมนู <b>⋮ (มุมขวาบนของ Chrome)</b> &rarr; เลือก <b>"ติดตั้งแอป (Install app)"</b> หรือ <b>"เพิ่มลงในหน้าจอหลัก"</b></p>
+          <p>คลิกไอคอน <b>รูปหน้าจอคอมพิวเตอร์พร้อมลูกศรลง 📥</b> ที่ด้านขวาของแถบ URL ด้านบน หรือกดเมนู <b>⋮ (มุมขวาบน)</b> &rarr; <b>"บันทึกและแชร์"</b> &rarr; <b>"ติดตั้งหน้าเว็บเป็นแอป"</b></p>
         </div>
         <div class="p-3.5 rounded-2xl bg-amber-50 border-2 border-amber-200">
           <div class="font-bold text-amber-950 text-sm mb-1">🍎 บน iPhone / iPad (Safari / Chrome)</div>
