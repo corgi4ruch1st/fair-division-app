@@ -244,21 +244,31 @@
         </div>
       </div>
 
-      <!-- PWA Installation Visual Box -->
-      <div class="p-5 rounded-3xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200">
-        <h3 class="text-sm font-bold text-amber-950 mb-2">📲 วิธีติดตั้งแอปลง Notebook และ มือถือ (PWA Offline-Ready)</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-          <div class="bg-white p-3 rounded-2xl border border-amber-200">
-            <b>💻 บน Notebook (Chrome/Edge):</b><br>
-            กดปุ่ม <b>"📲 ติดตั้งแอป"</b> มุมขวาบนของเว็บ หรือกดไอคอนรูปหน้าจอคอมพิวเตอร์ 📥 ที่ท้ายแถบ URL ด้านบน
+      <!-- APK & PWA Installation Visual Box -->
+      <div class="p-5 rounded-3xl bg-gradient-to-r from-amber-50 via-emerald-50/50 to-orange-50 border-2 border-amber-200 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-sm font-bold text-amber-950">🤖 วิธีติดตั้งเป็นแอปมือถือจริง (.APK สำหรับ Android) และ PWA (iOS / Notebook)</h3>
+          <a href="https://github.com/corgi4ruch1st/fair-division-app/releases/latest/download/FairShare-Cozy.apk" target="_blank"
+             class="no-print inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold shadow-xs">
+            🤖 ดาวน์โหลด FairShare-Cozy.apk
+          </a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <div class="bg-white p-3 rounded-2xl border-2 border-emerald-200">
+            <b class="text-emerald-900">🤖 1. แอป Android แท้ (.APK):</b><br>
+            กดปุ่ม <b>"🤖 ดาวน์โหลด .APK"</b> บนแถบด้านบนของเว็บ &rarr; เปิดไฟล์ <code>FairShare-Cozy.apk</code> ในมือถือ Android &rarr; กด <b>"ติดตั้ง (Install)"</b> ได้ไอคอนแอปแท้บนเครื่องทันที
           </div>
           <div class="bg-white p-3 rounded-2xl border border-amber-200">
-            <b>📱 บน Android (Chrome):</b><br>
+            <b>📱 2. Android ผ่าน Chrome (PWA):</b><br>
             กดปุ่ม <b>"📲 ติดตั้งแอป"</b> บนเว็บ หรือกดเมนู <b>⋮</b> มุมขวาบน &rarr; เลือก <b>"ติดตั้งแอป (Install app)"</b>
           </div>
           <div class="bg-white p-3 rounded-2xl border border-amber-200">
-            <b>🍎 บน iPhone / iPad (Safari):</b><br>
+            <b>🍎 3. iPhone / iPad (Safari):</b><br>
             กดปุ่ม <b>แชร์ (Share ⬆️)</b> ด้านล่างหน้าจอ &rarr; เลือก <b>"เพิ่มไปยังหน้าจอโฮม (Add to Home Screen)"</b>
+          </div>
+          <div class="bg-white p-3 rounded-2xl border border-amber-200">
+            <b>💻 4. Notebook (Chrome/Edge):</b><br>
+            กดปุ่ม <b>"📲 ติดตั้งแอป"</b> มุมขวาบนของเว็บ หรือกดไอคอนรูปหน้าจอคอมพิวเตอร์ 📥 ที่ท้ายแถบ URL ด้านบน
           </div>
         </div>
       </div>
@@ -474,9 +484,104 @@
       </div>
     </section>
 
+    <div class="page-break"></div>
+
+    <!-- ==================== PART 3: GOOGLE SHEETS & HYBRID DATABASE GUIDE ==================== -->
+    <section class="bento-page p-6 sm:p-8 space-y-6">
+      <div class="border-b-2 border-emerald-100 pb-4">
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-700">Part 3 • Hybrid Database & Google Sheets Cloud Sync</span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
+          📊 ส่วนที่ 3: ระบบฐานข้อมูล Google Sheets & ตารางสรุปผลอัตโนมัติ
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-600">
+          ทำงานแบบ <b>Hybrid Architecture</b> ใช้ได้แม้ไม่มีอินเทอร์เน็ต (Offline-First) และซิงค์ข้อมูลพร้อมตารางสรุปผลแบบอ่านง่ายลง Google Sheets ของคุณอัตโนมัติ
+        </p>
+      </div>
+
+      <!-- Illustrated SVG Architecture Diagram -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div class="md:col-span-6">
+          <svg viewBox="0 0 420 230" class="w-full rounded-2xl border-2 border-emerald-200 bg-emerald-50/40" xmlns="http://www.w3.org/2000/svg">
+            <text x="210" y="24" font-size="12" font-family="Prompt, sans-serif" font-weight="bold" fill="#065F46" text-anchor="middle">สถาปัตยกรรมการเก็บข้อมูลแบบ Hybrid (แอปมือถือ + Google Sheets)</text>
+            <!-- Left Box: App / LocalStorage -->
+            <rect x="18" y="42" width="155" height="168" rx="18" fill="#FFFFFF" stroke="#A78BFA" stroke-width="2.5"/>
+            <text x="95" y="70" font-size="24" text-anchor="middle">📱💻</text>
+            <text x="95" y="92" font-size="11" font-family="Prompt, sans-serif" font-weight="bold" fill="#4C1D95" text-anchor="middle">Web App / แอป .APK</text>
+            <rect x="30" y="104" width="131" height="26" rx="8" fill="#EDE9FE"/>
+            <text x="95" y="121" font-size="10" font-family="Prompt, sans-serif" fill="#5B21B6" font-weight="bold" text-anchor="middle">⚡ LocalStorage (Offline)</text>
+            <text x="95" y="146" font-size="9.5" font-family="Prompt, sans-serif" fill="#475569" text-anchor="middle">• เปิดปุ๊บติดปั๊บใน 0.1 วินาที</text>
+            <text x="95" y="164" font-size="9.5" font-family="Prompt, sans-serif" fill="#475569" text-anchor="middle">• คำนวณ 6 โหมดในเครื่องทันที</text>
+            <text x="95" y="182" font-size="9.5" font-family="Prompt, sans-serif" fill="#475569" text-anchor="middle">• ไม่ใช้เน็ตก็แบ่งของได้</text>
+
+            <!-- Sync Arrows -->
+            <path d="M180 110 L238 110" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
+            <polygon points="236,104 246,110 236,116" fill="#10B981"/>
+            <path d="M242 138 L184 138" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round"/>
+            <polygon points="186,132 176,138 186,144" fill="#8B5CF6"/>
+            <text x="211" y="98" font-size="9.5" font-family="Prompt, sans-serif" font-weight="bold" fill="#047857" text-anchor="middle">☁️ Auto Sync</text>
+
+            <!-- Right Box: Google Sheets 4 Tabs -->
+            <rect x="248" y="42" width="155" height="168" rx="18" fill="#FFFFFF" stroke="#34D399" stroke-width="2.5"/>
+            <text x="325" y="68" font-size="22" text-anchor="middle">📊</text>
+            <text x="325" y="88" font-size="11" font-family="Prompt, sans-serif" font-weight="bold" fill="#065F46" text-anchor="middle">Google Sheets (4 แท็บ)</text>
+            <rect x="260" y="98" width="131" height="22" rx="6" fill="#D1FAE5"/>
+            <text x="325" y="113" font-size="9.5" font-family="Prompt, sans-serif" font-weight="bold" fill="#065F46" text-anchor="middle">1. 🏠 ศูนย์รวมและสรุปผล</text>
+            <rect x="260" y="125" width="131" height="22" rx="6" fill="#FEF3C7"/>
+            <text x="325" y="140" font-size="9.5" font-family="Prompt, sans-serif" font-weight="bold" fill="#92400E" text-anchor="middle">2. 📋 Sessions (ข้อมูลห้อง)</text>
+            <rect x="260" y="152" width="131" height="22" rx="6" fill="#EDE9FE"/>
+            <text x="325" y="167" font-size="9.5" font-family="Prompt, sans-serif" font-weight="bold" fill="#5B21B6" text-anchor="middle">3. 🪙 Valuations (คะแนนโหวต)</text>
+            <rect x="260" y="179" width="131" height="22" rx="6" fill="#FCE7F3"/>
+            <text x="325" y="194" font-size="9.5" font-family="Prompt, sans-serif" font-weight="bold" fill="#9D174D" text-anchor="middle">4. ⚖️ Allocations (ผลลัพธ์)</text>
+          </svg>
+        </div>
+
+        <div class="md:col-span-6 space-y-3 text-xs leading-relaxed">
+          <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-2">
+            <div class="font-bold text-emerald-950 text-sm">🏠 แท็บที่ 1: "ศูนย์รวมและสรุปผล" (Dashboard อ่านง่าย)</div>
+            <p class="text-slate-700">
+              สร้างขึ้นเป็นหน้าแรกสุดของ Google Sheet เพื่อให้เจ้าของไฟล์และเพื่อนๆ เปิดดูได้ง่ายโดยไม่ต้องอ่านโค้ด JSON ประกอบด้วย:
+            </p>
+            <ul class="list-disc pl-5 space-y-1 text-slate-700">
+              <li><b>ตารางรวมลิงก์สำคัญทั้งหมดของโปรเจกต์:</b> ลิงก์เข้าเว็บแอป, ลิงก์คู่มือ PDF, ลิงก์ดาวน์โหลดไฟล์ <code>.APK</code>, ลิงก์ GitHub Repo และลิงก์ Google Sheet</li>
+              <li><b>ตารางสรุปผลการแบ่งสรรภาษาคน (Human-Readable Log):</b> สรุปว่าแต่ละห้องใครได้รับของชิ้นไหน ได้กี่ % หรือต้องจ่ายเงิน/ค่าเช่ากี่บาท พร้อมสถานะความแฟร์</li>
+            </ul>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-1.5">
+            <div class="font-bold text-amber-950 text-sm">🔄 วิธีสั่งซิงค์หรืออัปเดตตารางใน Google Sheets (2 วิธี)</div>
+            <div><b>วิธีที่ 1 (กดจากหน้าแอป):</b> กดปุ่ม <b>"📊 Google Sheets"</b> บนแถบด้านบนของเว็บ/แอป &rarr; กดปุ่ม <b>"🔄 ซิงค์ข้อมูลทั้งหมดลง Sheet ทันที"</b></div>
+            <div><b>วิธีที่ 2 (กดจากในไฟล์ Google Sheet):</b> เปิดไฟล์ Google Sheet &rarr; กดเมนูด้านบน <b>"⚖️ Fair Division App"</b> &rarr; เลือก <b>"🏠 สร้าง/อัปเดตหน้า ศูนย์รวมลิงก์ & ตารางสรุปผล"</b></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Table of All Project Links -->
+      <div class="p-4 rounded-2xl bg-slate-50 border-2 border-slate-200 text-xs space-y-2">
+        <div class="font-bold text-slate-800">🔗 สารบัญลิงก์สำคัญทั้งหมดของระบบ (คลิกเปิดได้ทันที):</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+          <div class="p-2.5 rounded-xl bg-white border border-slate-200">
+            🌐 <b>เว็บแอปหลัก (PWA):</b><br>
+            <a href="https://corgi4ruch1st.github.io/fair-division-app/" target="_blank" class="text-violet-600 underline break-all">https://corgi4ruch1st.github.io/fair-division-app/</a>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white border border-slate-200">
+            📘 <b>หน้าคู่มือภาพการ์ตูน & ดาวน์โหลด PDF:</b><br>
+            <a href="https://corgi4ruch1st.github.io/fair-division-app/guide.html" target="_blank" class="text-violet-600 underline break-all">https://corgi4ruch1st.github.io/fair-division-app/guide.html</a>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white border border-slate-200">
+            🤖 <b>ดาวน์โหลดแอป Android (.APK):</b><br>
+            <a href="https://github.com/corgi4ruch1st/fair-division-app/releases/latest/download/FairShare-Cozy.apk" target="_blank" class="text-emerald-700 underline break-all">https://github.com/corgi4ruch1st/fair-division-app/releases/latest/download/FairShare-Cozy.apk</a>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white border border-slate-200">
+            📊 <b>ฐานข้อมูล Google Sheets:</b><br>
+            <a href="https://docs.google.com/spreadsheets/d/1A6-d9251f9tW-ycbB7v8v8nU-K43A7vY9U0mR0wG2f8/edit" target="_blank" class="text-emerald-700 underline break-all">เปิดไฟล์ Google Sheets ฐานข้อมูลระบบ</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Footer -->
     <footer class="text-center text-xs text-slate-400 pt-4 pb-8">
-      จัดทำโดยระบบ <b>FairShare Cozy Suite</b> • พัฒนาด้วยทฤษฎี Fair Division & Google Apps Script / GitHub Pages PWA
+      จัดทำโดยระบบ <b>FairShare Cozy Suite</b> • พัฒนาด้วยทฤษฎี Fair Division, Google Sheets Cloud Sync, GitHub Pages PWA & Android APK
     </footer>
 
   </main>
