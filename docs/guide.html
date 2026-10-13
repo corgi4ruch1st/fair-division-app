@@ -62,10 +62,10 @@
         </span>
       </div>
       <div class="flex items-center gap-2">
-        <a href="./FairShare_Guide.pdf" download="FairShare_Manual_and_Theory_Guide.pdf"
-           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow transition">
-          <span>📥 ดาวน์โหลดไฟล์ PDF (พร้อมอ่านออฟไลน์)</span>
-        </a>
+        <button id="downloadPdfBtn" onclick="downloadGuideAsPdf()"
+                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow transition cursor-pointer">
+          <span>📥 ดาวน์โหลดไฟล์ PDF ลงเครื่อง</span>
+        </button>
         <button onclick="window.print()"
                 class="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold shadow transition cursor-pointer">
           <span>🖨️ พิมพ์ / Save as PDF</span>
@@ -74,7 +74,7 @@
     </div>
   </nav>
 
-  <main class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 space-y-8">
+  <main id="pdfContentArea" class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 space-y-8">
 
     <!-- ==================== COVER PAGE ==================== -->
     <section class="bento-page p-8 sm:p-10 bg-gradient-to-br from-amber-50 via-white to-violet-50 relative overflow-hidden">
@@ -480,5 +480,37 @@
     </footer>
 
   </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    function downloadGuideAsPdf() {
+      const btn = document.getElementById('downloadPdfBtn');
+      const el = document.getElementById('pdfContentArea');
+      if (typeof html2pdf === 'undefined') {
+        window.print();
+        return;
+      }
+      if (btn) btn.innerHTML = '<span>⏳ กำลังสร้างไฟล์ PDF...</span>';
+      const opt = {
+        margin: [8, 8, 8, 8],
+        filename: 'FairShare_Manual_and_Theory_Guide.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#FFFDF7' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(el).save().then(() => {
+        if (btn) btn.innerHTML = '<span>✅ ดาวน์โหลด PDF เรียบร้อย!</span>';
+        setTimeout(() => {
+          if (btn) btn.innerHTML = '<span>📥 ดาวน์โหลดไฟล์ PDF ลงเครื่อง</span>';
+        }, 3000);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.location.search.includes('download=1')) {
+        setTimeout(downloadGuideAsPdf, 600);
+      }
+    });
+  </script>
 </body>
 </html>
