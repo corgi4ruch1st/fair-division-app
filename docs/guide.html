@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คู่มือการใช้งานและทฤษฎี Fair Division ฉบับสมบูรณ์ | FairShare Cozy 🧸</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: #FFFDF7;
+      color: #334155;
+    }
+    h1, h2, h3, h4, .font-cute {
+      font-family: 'Mitr', 'Prompt', sans-serif;
+    }
+    .bento-page {
+      background: #FFFFFF;
+      border: 3px solid #F3E8D2;
+      border-radius: 1.75rem;
+      box-shadow: 0 10px 25px -5px rgba(180, 140, 100, 0.08), 0 4px 0px 0px #F3E8D2;
+    }
+    .math-box {
+      background: #F8FAFC;
+      border-left: 4px solid #8B5CF6;
+      font-family: 'Courier New', monospace;
+    }
+    @media print {
+      body {
+        background: #FFFFFF !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .bento-page {
+        box-shadow: none !important;
+        border: 2px solid #E2E8F0 !important;
+        break-inside: avoid;
+        margin-bottom: 1.25rem !important;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-16">
+
+  <!-- Top Sticky Action Bar (ซ่อนเวลาสั่งพิมพ์ PDF) -->
+  <nav class="no-print sticky top-0 z-40 bg-gradient-to-r from-amber-100 via-yellow-100 to-purple-100 border-b-2 border-amber-300 px-4 py-3 shadow-sm">
+    <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <a href="./index.html" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white hover:bg-amber-50 text-slate-800 border-2 border-amber-300 text-xs font-bold shadow-xs transition">
+          <span>⬅️ กลับหน้าแอป FairShare</span>
+        </a>
+        <span class="text-xs font-semibold text-slate-700 hidden sm:inline">
+          📘 คู่มือการใช้งาน & สารานุกรมทฤษฎี Fair Division ฉบับภาพการ์ตูน
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="./FairShare_Guide.pdf" download="FairShare_Manual_and_Theory_Guide.pdf"
+           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow transition">
+          <span>📥 ดาวน์โหลดไฟล์ PDF (พร้อมอ่านออฟไลน์)</span>
+        </a>
+        <button onclick="window.print()"
+                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold shadow transition cursor-pointer">
+          <span>🖨️ พิมพ์ / Save as PDF</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 space-y-8">
+
+    <!-- ==================== COVER PAGE ==================== -->
+    <section class="bento-page p-8 sm:p-10 bg-gradient-to-br from-amber-50 via-white to-violet-50 relative overflow-hidden">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div class="md:col-span-7 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-200/80 text-amber-950 text-xs font-bold">
+            <span>🧸 Official Visual Handbook & Theory Guide</span>
+          </div>
+          <h1 class="text-2xl sm:text-4xl font-bold text-slate-900 leading-tight">
+            คู่มือการใช้งาน <span class="text-violet-600">FairShare Cozy</span><br>
+            และทฤษฎีการแบ่งสรรอย่างยุติธรรม
+          </h1>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            เอกสารฉบับสมบูรณ์ที่อธิบายทั้ง <b>วิธีใช้งานแอปพลิเคชันทีละขั้นตอน</b> และเจาะลึก <b>6 ทฤษฎีเศรษฐศาสตร์คณิตศาสตร์ (Fair Division Theory)</b> ด้วยภาพประกอบการ์ตูนเข้าใจง่าย เห็นภาพจริง พร้อมสูตรการคำนวณเบื้องหลัง
+          </p>
+          <div class="flex flex-wrap gap-2 pt-2 text-xs font-semibold">
+            <span class="px-3 py-1 rounded-xl bg-violet-100 text-violet-800">🎁 แบ่งสิ่งของ</span>
+            <span class="px-3 py-1 rounded-xl bg-pink-100 text-pink-800">🍰 ตัดเค้ก %</span>
+            <span class="px-3 py-1 rounded-xl bg-amber-100 text-amber-800">🧹 แบ่งเวร</span>
+            <span class="px-3 py-1 rounded-xl bg-emerald-100 text-emerald-800">🏠 หารค่าห้อง</span>
+            <span class="px-3 py-1 rounded-xl bg-purple-100 text-purple-800">🏛️ แบ่งมรดก</span>
+            <span class="px-3 py-1 rounded-xl bg-cyan-100 text-cyan-800">🚕 หารค่าแท็กซี่</span>
+          </div>
+        </div>
+
+        <!-- Custom Cartoon SVG Illustration: Cute Balance Scale & Animal Friends -->
+        <div class="md:col-span-5 flex justify-center">
+          <svg viewBox="0 0 360 280" class="w-full max-w-xs drop-shadow-sm" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="10" width="340" height="260" rx="32" fill="#FEF3C7" stroke="#FCD34D" stroke-width="3"/>
+            <circle cx="65" cy="55" r="22" fill="#EDE9FE"/>
+            <circle cx="300" cy="65" r="16" fill="#FCE7F3"/>
+            <!-- Scale Base & Pillar -->
+            <rect x="120" y="225" width="120" height="16" rx="8" fill="#7C3AED"/>
+            <rect x="173" y="85" width="14" height="145" rx="7" fill="#8B5CF6"/>
+            <circle cx="180" cy="80" r="16" fill="#F59E0B" stroke="#FFFFFF" stroke-width="3"/>
+            <!-- Scale Beam -->
+            <line x1="75" y1="105" x2="285" y2="105" stroke="#7C3AED" stroke-width="8" stroke-linecap="round"/>
+            <!-- Left Pan -->
+            <line x1="85" y1="105" x2="65" y2="165" stroke="#A78BFA" stroke-width="3"/>
+            <line x1="85" y1="105" x2="105" y2="165" stroke="#A78BFA" stroke-width="3"/>
+            <path d="M50 165 Q85 190 120 165 Z" fill="#FBBF24" stroke="#D97706" stroke-width="2.5"/>
+            <text x="85" y="155" font-size="34" text-anchor="middle">🐻🎁</text>
+            <!-- Right Pan -->
+            <line x1="275" y1="105" x2="255" y2="165" stroke="#A78BFA" stroke-width="3"/>
+            <line x1="275" y1="105" x2="295" y2="165" stroke="#A78BFA" stroke-width="3"/>
+            <path d="M240 165 Q275 190 310 165 Z" fill="#FBBF24" stroke="#D97706" stroke-width="2.5"/>
+            <text x="275" y="155" font-size="34" text-anchor="middle">🐰🍰</text>
+            <!-- Center Badge -->
+            <rect x="132" y="192" width="96" height="26" rx="13" fill="#10B981"/>
+            <text x="180" y="209" font-size="12" font-family="Prompt, sans-serif" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Envy-Free 100%</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PART 1: VISUAL USER GUIDE ==================== -->
+    <section class="bento-page p-6 sm:p-8 space-y-6">
+      <div class="border-b-2 border-amber-100 pb-4">
+        <span class="text-xs font-bold uppercase tracking-wider text-violet-600">Part 1 • Step-by-Step User Manual</span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
+          🚀 ส่วนที่ 1: คู่มือการใช้งานแอปพลิเคชัน (4 ขั้นตอนง่ายๆ)
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-600">
+          ออกแบบมาให้ใช้งานได้ทันทีทั้งบนคอมพิวเตอร์และมือถือ โดยไม่ต้องคำนวณเลขเองแม้แต่บรรทัดเดียว
+        </p>
+      </div>
+
+      <!-- Visual 4 Steps Diagram -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Step 1 -->
+        <div class="p-5 rounded-3xl bg-violet-50/70 border-2 border-violet-200 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2.5 mb-2">
+              <span class="w-8 h-8 rounded-2xl bg-violet-600 text-white font-bold text-sm flex items-center justify-center font-cute">1</span>
+              <h3 class="text-base font-bold text-violet-950">เลือกโหมดและสร้างห้องแบ่งสรร</h3>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+              กดปุ่ม <b>"＋ สร้างห้องแบ่งสรรใหม่"</b> มุมขวาบน แล้วเลือกโหมดจากทั้ง 6 โหมด ระบุรายชื่อเพื่อนๆ และรายการสิ่งของ/ห้องพัก/งานบ้านที่ต้องการแบ่ง
+            </p>
+          </div>
+          <!-- Mock UI Graphic Step 1 -->
+          <div class="bg-white p-3.5 rounded-2xl border-2 border-violet-100 text-xs space-y-2">
+            <div class="font-bold text-slate-700">ตัวอย่างการกรอกสร้างห้อง:</div>
+            <div class="grid grid-cols-3 gap-1.5 text-center text-[11px]">
+              <div class="p-2 rounded-xl bg-violet-100 text-violet-900 font-bold border border-violet-300">🎁 แบ่งของ</div>
+              <div class="p-2 rounded-xl bg-amber-50 text-slate-600 border border-amber-200">🧹 แบ่งเวร</div>
+              <div class="p-2 rounded-xl bg-emerald-50 text-slate-600 border border-emerald-200">🏠 หารค่าห้อง</div>
+            </div>
+            <div class="p-2 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600">
+              👥 <b>ผู้เข้าร่วม:</b> ก้อง, มายด์, เจมส์<br>
+              📦 <b>รายการ:</b> จอมอนิเตอร์, คีย์บอร์ด, หูฟัง
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="p-5 rounded-3xl bg-amber-50/70 border-2 border-amber-200 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2.5 mb-2">
+              <span class="w-8 h-8 rounded-2xl bg-amber-500 text-white font-bold text-sm flex items-center justify-center font-cute">2</span>
+              <h3 class="text-base font-bold text-amber-950">หยอดคะแนนความชอบ (3 รูปแบบ)</h3>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+              คลิกที่แท็บ <b>"🪙 2. หยอดคะแนนความชอบ"</b> เลือกชื่อตัวละครของคุณ แล้วเลื่อนแถบให้คะแนน หากใช้โหมด 100 เหรียญ สามารถกดปุ่ม <b>"🪄 ปรับให้ครบ 100 อัตโนมัติ"</b> ได้เลย!
+            </p>
+          </div>
+          <!-- Mock UI Graphic Step 2 -->
+          <div class="bg-white p-3.5 rounded-2xl border-2 border-amber-100 text-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-800">🐻 ก้อง (Kong)</span>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px]">✓ ครบ 100 เหรียญพอดี!</span>
+            </div>
+            <div class="space-y-1.5 text-[11px]">
+              <div class="flex items-center justify-between">
+                <span>1. จอมอนิเตอร์ 27 นิ้ว</span>
+                <div class="w-28 bg-amber-100 h-2.5 rounded-full overflow-hidden"><div class="bg-violet-600 h-full w-1/2"></div></div>
+                <b class="text-violet-700">45 🪙</b>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>2. คีย์บอร์ดไร้สาย</span>
+                <div class="w-28 bg-amber-100 h-2.5 rounded-full overflow-hidden"><div class="bg-violet-600 h-full w-1/4"></div></div>
+                <b class="text-violet-700">20 🪙</b>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="p-5 rounded-3xl bg-pink-50/70 border-2 border-pink-200 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2.5 mb-2">
+              <span class="w-8 h-8 rounded-2xl bg-pink-500 text-white font-bold text-sm flex items-center justify-center font-cute">3</span>
+              <h3 class="text-base font-bold text-pink-950">โหมดส่งต่อมือถือแบบลับ (Pass-the-Phone 🙈)</h3>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+              หากเพื่อนๆ นั่งอยู่ด้วยกันและใช้มือถือเครื่องเดียว ให้กดปุ่มสีเหลือง <b>"🙈 บันทึก & ส่งมือถือให้เพื่อนคนถัดไป"</b> ระบบจะขึ้นม่านการ์ตูนบังคะแนนไว้ ไม่ให้เพื่อนแอบดูคะแนนกัน!
+            </p>
+          </div>
+          <!-- Mock UI Graphic Step 3 -->
+          <div class="bg-white p-3.5 rounded-2xl border-2 border-pink-100 text-center space-y-1.5">
+            <div class="text-2xl">🐱🙈</div>
+            <div class="text-xs font-bold text-slate-800">ส่งมือถือให้ "มายด์ (Mind)" กรอกคะแนนได้เลย!</div>
+            <div class="inline-block px-3 py-1 rounded-xl bg-violet-600 text-white text-[10px] font-bold">
+              🔓 ฉันคือมายด์ — เปิดหน้ากรอกคะแนน
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="p-5 rounded-3xl bg-emerald-50/70 border-2 border-emerald-200 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2.5 mb-2">
+              <span class="w-8 h-8 rounded-2xl bg-emerald-600 text-white font-bold text-sm flex items-center justify-center font-cute">4</span>
+              <h3 class="text-base font-bold text-emerald-950">ดูนิทานความแฟร์ & แชร์ใบเสร็จเข้า LINE</h3>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+              เมื่อบันทึกครบ ระบบจะแสดง <b>"นิทานอธิบายความแฟร์"</b>, การ์ดสรุปผลรายบุคคล, ตารางพิสูจน์ความไม่อิจฉา และกดปุ่ม <b>"🧾 สร้างใบเสร็จส่ง LINE"</b> เพื่อก๊อปปี้ส่งเข้ากลุ่มแชตได้ทันที!
+            </p>
+          </div>
+          <!-- Mock UI Graphic Step 4 -->
+          <div class="bg-white p-3.5 rounded-2xl border-2 border-emerald-100 text-[11px] font-mono text-slate-700 space-y-1">
+            <div class="font-bold text-emerald-800">🧸✨ ใบสรุปความยุติธรรม FairShare ✨⚖️</div>
+            <div>🐻 ก้อง (60%) ➜ จอมอนิเตอร์, แท่นวาง</div>
+            <div>🐱 มายด์ (65%) ➜ หูฟัง Sony, บัตรกาแฟ</div>
+            <div>🐰 เจมส์ (60%) ➜ คีย์บอร์ด, เมาส์</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PWA Installation Visual Box -->
+      <div class="p-5 rounded-3xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200">
+        <h3 class="text-sm font-bold text-amber-950 mb-2">📲 วิธีติดตั้งแอปลง Notebook และ มือถือ (PWA Offline-Ready)</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div class="bg-white p-3 rounded-2xl border border-amber-200">
+            <b>💻 บน Notebook (Chrome/Edge):</b><br>
+            กดปุ่ม <b>"📲 ติดตั้งแอป"</b> มุมขวาบนของเว็บ หรือกดไอคอนรูปหน้าจอคอมพิวเตอร์ 📥 ที่ท้ายแถบ URL ด้านบน
+          </div>
+          <div class="bg-white p-3 rounded-2xl border border-amber-200">
+            <b>📱 บน Android (Chrome):</b><br>
+            กดปุ่ม <b>"📲 ติดตั้งแอป"</b> บนเว็บ หรือกดเมนู <b>⋮</b> มุมขวาบน &rarr; เลือก <b>"ติดตั้งแอป (Install app)"</b>
+          </div>
+          <div class="bg-white p-3 rounded-2xl border border-amber-200">
+            <b>🍎 บน iPhone / iPad (Safari):</b><br>
+            กดปุ่ม <b>แชร์ (Share ⬆️)</b> ด้านล่างหน้าจอ &rarr; เลือก <b>"เพิ่มไปยังหน้าจอโฮม (Add to Home Screen)"</b>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PART 2: ILLUSTRATED THEORY ENCYCLOPEDIA ==================== -->
+    <div class="page-break"></div>
+
+    <!-- CHAPTER 1: INDIVISIBLE GOODS -->
+    <section class="bento-page p-6 sm:p-8 space-y-5">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-violet-100 pb-4">
+        <div>
+          <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-violet-100 text-violet-800">ทฤษฎีบทที่ 1 • Indivisible Goods Allocation</span>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
+            🎁 1. ทฤษฎีการแบ่งสิ่งของเป็นชิ้น (MNW, Leximin & Adjusted Winner)
+          </h2>
+        </div>
+      </div>
+
+      <!-- Illustrated SVG Diagram for Goods -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div class="md:col-span-5">
+          <svg viewBox="0 0 340 220" class="w-full rounded-2xl border-2 border-violet-100 bg-violet-50/50" xmlns="http://www.w3.org/2000/svg">
+            <text x="170" y="28" font-size="13" font-family="Prompt, sans-serif" font-weight="bold" fill="#4C1D95" text-anchor="middle">เปรียบเทียบความพึงพอใจเมื่อแบ่งด้วย MNW</text>
+            <!-- Kong -->
+            <rect x="20" y="45" width="90" height="150" rx="16" fill="#FFFFFF" stroke="#C4B5FD" stroke-width="2"/>
+            <text x="65" y="75" font-size="26" text-anchor="middle">🐻</text>
+            <text x="65" y="96" font-size="11" font-family="Prompt, sans-serif" font-weight="bold" fill="#1E293B" text-anchor="middle">ก้อง</text>
+            <text x="65" y="120" font-size="10" font-family="Prompt, sans-serif" fill="#6D28D9" text-anchor="middle">🖥️ จอ 27" (45%)</text>
+            <text x="65" y="138" font-size="10" font-family="Prompt, sans-serif" fill="#6D28D9" text-anchor="middle">💻 แท่นวาง (5%)</text>
+            <rect x="32" y="160" width="66" height="22" rx="11" fill="#EDE9FE"/>
+            <text x="65" y="175" font-size="11" font-family="Prompt, sans-serif" font-weight="bold" fill="#5B21B6" text-anchor="middle">รวม 50%</text>
+            <!-- Mind -->
+            <rect x="125" y="45" width="90" height="150" rx="16" fill="#FFFFFF" stroke="#C4B5FD" stroke-width="2"/>
+            <text x="170" y="75" font-size="26" text-anchor="middle">🐱</text>
+            <text x="170" y="96" font-size="11" font-family="Prompt, sans-serif" font-weight="bold" fill="#1E293B" text-anchor="middle">มายด์</text>
+            <text x="170" y="120" font-size="10" font-family="Prompt, sans-serif" fill="#6D28D9" text-anchor="middle">🎧 หูฟัง (45%)</text>
+            <text x="170" y="138" font-size="10" font-family="Prompt, sans-serif" fill="#6D28D9" text-anchor="middle">☕ บัตรกาแฟ (20%)</text>
+            <rect x="137" y="160" width="66" height="22" rx="11" fill="#EDE9FE"/>
+            <text x="170" y="175" font-size="11" font-family="Prompt, sans-serif" font-weight="bold" fill="#5B21B6" text-anchor="middle">รวม 65%</text>
+            <!-- James -->
+            <rect x="230" y="45" width="90" height="150" rx="16" fill="#FFFFFF" stroke="#C4B5FD" stroke-width="2"/>
+            <text x="275" y="75" font-size="26" text-anchor="middle">🐰</text>
+            <text x="275" y="96" font-size="11" font-family="Prompt, sans-serif" font-weight="bold" fill="#1E293B" text-anchor="middle">เจมส์</text>
+            <text x="275" y="120" font-size="10" font-family="Prompt, sans-serif" fill="#6D28D9" text-anchor="middle">⌨️ คีย์บอร์ด (35%)</text>
+            <text x="275" y="138" font-size="10" font-family="Prompt, sans-serif" fill="#6D28D9" text-anchor="middle">🖱️ เมาส์ (25%)</text>
+            <rect x="242" y="160" width="66" height="22" rx="11" fill="#EDE9FE"/>
+            <text x="275" y="175" font-size="11" font-family="Prompt, sans-serif" font-weight="bold" fill="#5B21B6" text-anchor="middle">รวม 60%</text>
+          </svg>
+        </div>
+
+        <div class="md:col-span-7 space-y-3 text-xs sm:text-sm leading-relaxed">
+          <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200">
+            <b>💡 อธิบายแบบเข้าใจง่ายเห็นภาพ:</b><br>
+            เวลาแบ่งของที่เป็นชิ้นๆ (หั่นครึ่งไม่ได้ เช่น จอคอม หูฟัง คีย์บอร์ด) หากจับฉลาก คนที่อยากได้หูฟังอาจจับได้คีย์บอร์ด ส่วนคนที่อยากได้คีย์บอร์ดกลับจับได้หูฟัง! อัลกอริทึม <b>Maximum Nash Welfare (MNW)</b> จะค้นหาการจับคู่ที่ <b>"มอบของแต่ละชิ้นให้คนที่รักและให้คุณค่ากับมันมากที่สุด"</b> โดยบังคับว่าต้องไม่มีใครถูกทอดทิ้งให้ได้คะแนนต่ำเตี้ยเรี่ยดิน
+          </div>
+          <div class="math-box p-3.5 rounded-xl text-xs space-y-1">
+            <div class="font-bold text-violet-900">📐 สมการและเกณฑ์ทางคณิตศาสตร์:</div>
+            <div>• <b>Maximum Nash Welfare:</b> ค้นหาการจัดสรร (A₁, ..., Aₙ) ที่ทำให้ผลคูณความพึงพอใจ <b>∏ᵢ uᵢ(Aᵢ) สูงที่สุด</b></div>
+            <div>• <b>เกณฑ์ EF1 (Envy-Free up to 1 item):</b> สำหรับทุกคู่ i, j จะมีของอย่างมาก 1 ชิ้น g ในกองของ j ที่เมื่อนำออกแล้ว uᵢ(Aᵢ) ≥ uᵢ(Aⱼ \ {g}) เสมอ (ทฤษฎีบทของ Caragiannis et al., 2019)</div>
+            <div>• <b>Adjusted Winner (สำหรับ 2 คน):</b> ให้ของแก่คนที่ให้แต้มสูงกว่าก่อน แล้วโอนย้ายชิ้นที่มีอัตราส่วนแต้ม u₁(g)/u₂(g) ใกล้เคียง 1 ที่สุด จนกว่า u₁ = u₂ พอดี</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 2: CAKE CUTTING -->
+    <section class="bento-page p-6 sm:p-8 space-y-5">
+      <div class="border-b-2 border-pink-100 pb-4">
+        <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-800">ทฤษฎีบทที่ 2 • Divisible Goods & Cake-Cutting</span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
+          🍰 2. ทฤษฎีการตัดเค้กและแบ่งสัดส่วน % (Envy-Free CEEI Equilibrium)
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div class="md:col-span-5">
+          <svg viewBox="0 0 340 200" class="w-full rounded-2xl border-2 border-pink-100 bg-pink-50/40" xmlns="http://www.w3.org/2000/svg">
+            <text x="170" y="26" font-size="12" font-family="Prompt, sans-serif" font-weight="bold" fill="#831843" text-anchor="middle">การแบ่งทรัพยากรเป็น % ตามความชอบของแต่ละทีม</text>
+            <!-- Bar 1 -->
+            <text x="25" y="55" font-size="11" font-family="Prompt, sans-serif" font-weight="bold" fill="#334155">🌅 เวลาช่วงเช้า (100%)</text>
+            <rect x="25" y="62" width="60" height="22" rx="6" fill="#A78BFA"/>
+            <text x="55" y="77" font-size="10" fill="#FFF" font-weight="bold" text-anchor="middle">A 20%</text>
+            <rect x="87" y="62" width="75" height="22" rx="6" fill="#F472B6"/>
+            <text x="124" y="77" font-size="10" fill="#FFF" font-weight="bold" text-anchor="middle">B 26%</text>
+            <rect x="164" y="62" width="150" height="22" rx="6" fill="#34D399"/>
+            <text x="239" y="77" font-size="10" fill="#064E3B" font-weight="bold" text-anchor="middle">ทีม C ได้ 54%</text>
+            <!-- Bar 2 -->
+            <text x="25" y="108" font-size="11" font-family="Prompt, sans-serif" font-weight="bold" fill="#334155">🌇 เวลาช่วงบ่าย (100%)</text>
+            <rect x="25" y="115" width="45" height="22" rx="6" fill="#A78BFA"/>
+            <text x="47" y="130" font-size="10" fill="#FFF" font-weight="bold" text-anchor="middle">15%</text>
+            <rect x="72" y="115" width="170" height="22" rx="6" fill="#F472B6"/>
+            <text x="157" y="130" font-size="10" fill="#FFF" font-weight="bold" text-anchor="middle">ทีม B ได้ 59%</text>
+            <rect x="244" y="115" width="70" height="22" rx="6" fill="#34D399"/>
+            <text x="279" y="130" font-size="10" fill="#064E3B" font-weight="bold" text-anchor="middle">C 26%</text>
+            <!-- Bar 3 -->
+            <text x="25" y="160" font-size="11" font-family="Prompt, sans-serif" font-weight="bold" fill="#334155">📢 งบโฆษณา (100%)</text>
+            <rect x="25" y="166" width="195" height="22" rx="6" fill="#A78BFA"/>
+            <text x="122" y="181" font-size="10" fill="#FFF" font-weight="bold" text-anchor="middle">ทีม A ได้ 68%</text>
+            <rect x="222" y="166" width="45" height="22" rx="6" fill="#F472B6"/>
+            <text x="244" y="181" font-size="10" fill="#FFF" font-weight="bold" text-anchor="middle">16%</text>
+            <rect x="269" y="166" width="45" height="22" rx="6" fill="#34D399"/>
+            <text x="291" y="181" font-size="10" fill="#064E3B" font-weight="bold" text-anchor="middle">16%</text>
+          </svg>
+        </div>
+
+        <div class="md:col-span-7 space-y-3 text-xs sm:text-sm leading-relaxed">
+          <div class="p-3.5 rounded-2xl bg-pink-50/70 border border-pink-200">
+            <b>💡 อธิบายแบบเข้าใจง่ายเห็นภาพ:</b><br>
+            สมมติเค้กก้อนหนึ่งมีทั้งหน้าช็อกโกแลตและหน้าสตรอว์เบอร์รี หรือการแบ่ง <b>"เวลาใช้ห้องประชุม / งบประมาณ"</b> ถ้าเราแบ่งครึ่งทุกอย่าง 33.3% เท่ากันเป๊ะ ทั้งที่ทีม A อยากได้งบโฆษณาแต่ไม่อยากได้ห้องเช้า ระบบจะขยับเปอร์เซ็นต์ให้ทีม A ได้งบโฆษณาเยอะขึ้น และให้ทีม C ที่ชอบช่วงเช้าได้เวลาเช้าเยอะขึ้น จนทุกคนได้ความพึงพอใจสูงถึง ~50–60% (มากกว่าการหารสามแบบทื่อๆ ที่ได้แค่ 33.3%!)
+          </div>
+          <div class="math-box p-3.5 rounded-xl text-xs space-y-1">
+            <div class="font-bold text-pink-900">📐 สมการ Eisenberg–Gale & CEEI Equilibrium:</div>
+            <div>• คำนวณสัดส่วน xᵢⱼ ∈ [0, 1] โดยที่ ∑ᵢ xᵢⱼ = 1 สำหรับทุกรายการ j</div>
+            <div>• หาจุดสูงสุดของ <b>∑ᵢ ln( ∑ⱼ xᵢⱼ · vᵢⱼ )</b> ซึ่งให้ผลลัพธ์ที่เป็นทั้ง <b>Strict Envy-Free 100%</b> (uᵢ(Xᵢ) ≥ uᵢ(Xₖ) ทุกคู่) และ <b>Proportional</b> (uᵢ(Xᵢ) ≥ 1/N) เสมอ</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="page-break"></div>
+
+    <!-- CHAPTER 3 & 4: CHORES & RENT DIVISION -->
+    <section class="bento-page p-6 sm:p-8 space-y-6">
+      <div class="border-b-2 border-emerald-100 pb-4">
+        <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">ทฤษฎีบทที่ 3 & 4 • Chores Allocation & Envy-Free Rent Division</span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
+          🧹 3. การแบ่งเวรทำงาน (Chores) & 🏠 4. การหารค่าเช่าห้อง (Rent Division)
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Chores Box -->
+        <div class="p-5 rounded-3xl bg-amber-50/60 border-2 border-amber-200 space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🧹🧽</span>
+            <h3 class="text-base font-bold text-amber-950">ทฤษฎีที่ 3: การแบ่งภาระงาน/เวร (EF1 Chores)</h3>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            <b>เข้าใจง่าย:</b> คะแนนในโหมดนี้คือ <b>"ความเหนื่อย/ความเกลียดงานนั้น"</b> เช่น ต้นเกลียดการล้างห้องน้ำมาก (ให้ 9/10) แต่บีมมองว่าการล้างห้องน้ำไม่ยาก (ให้ 4/10) ระบบจะจัดให้บีมรับหน้าที่ล้างห้องน้ำ แล้วให้ต้นไปทำหน้าที่จ่ายตลาดและถูพื้นที่ต้นมองว่าสบายกว่าแทน!
+          </p>
+          <div class="bg-white p-3 rounded-2xl border border-amber-200 text-xs space-y-1">
+            <div class="font-bold text-amber-900">📐 หลักคณิตศาสตร์ Min-Max Burden:</div>
+            <div>• ปรับฐานคะแนนความเหนื่อยรวมของแต่ละคนเป็น 100% ก่อน (ป้องกันคนแกล้งให้ทุกงาน 10 เต็ม 10 เพื่ออู้งาน!)</div>
+            <div>• ค้นหาการจัดเวรที่ทำให้ <b>ค่าความเหนื่อยสูงสุดของคนที่รับหนักสุดมีค่าน้อยที่สุด (Min-Max Disutility)</b> ภายใต้เงื่อนไข <b>EF1 for Chores</b></div>
+          </div>
+        </div>
+
+        <!-- Rent Division Box -->
+        <div class="p-5 rounded-3xl bg-emerald-50/60 border-2 border-emerald-200 space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🏠🔑</span>
+            <h3 class="text-base font-bold text-emerald-950">ทฤษฎีที่ 4: หารค่าเช่าห้องแบบไม่อิจฉา (Rent Division)</h3>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            <b>เข้าใจง่าย:</b> คอนโดค่าเช่ารวม 18,000 บาท มี 3 ห้องขนาดไม่เท่ากัน ถ้าหาร 6,000 เท่ากัน ทุกคนจะแย่งห้องใหญ่สุด! ระบบจึงให้ทุกคนประเมินราคาที่ตัวเองยอมจ่ายในแต่ละห้อง แล้วคำนวณราคาใหม่ เช่น ห้องใหญ่ 7,900฿, ห้องกลาง 5,700฿, ห้องเล็ก 4,400฿ จนทุกคนรู้สึกว่า <b>"ห้องและราคาที่เราได้คุ้มที่สุดแล้ว ไม่อยากสลับไปห้องเพื่อนเลย!"</b>
+          </p>
+          <div class="bg-white p-3 rounded-2xl border border-emerald-200 text-xs space-y-1">
+            <div class="font-bold text-emerald-900">📐 หลักคณิตศาสตร์ Utilitarian + Equalized Surplus:</div>
+            <div>• <b>ขั้นที่ 1:</b> หาการจับคู่ห้อง π ที่ทำให้ผลรวมมูลค่าประเมิน ∑ᵢ vᵢ(π(i)) สูงสุด</div>
+            <div>• <b>ขั้นที่ 2:</b> หาเวกเตอร์ราคา p₁ + ... + pₙ = R ที่ทำให้ส่วนเกินความคุ้มค่า <b>sᵢ = vᵢ(π(i)) - p_π(i) ≥ vᵢ(π(j)) - p_π(j)</b> และเกลี่ยส่วนเกินให้เท่ากันทุกคน</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 5 & 6: ESTATE & SHAPLEY COST -->
+    <section class="bento-page p-6 sm:p-8 space-y-6">
+      <div class="border-b-2 border-purple-100 pb-4">
+        <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800">ทฤษฎีบทที่ 5 & 6 • Knaster’s Sealed-Bid & Shapley Value Cost Sharing</span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
+          🏛️ 5. แบ่งมรดกพร้อมเงินชดเชย & 🚕 6. หารค่าแท็กซี่ด้วย Shapley Value
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Estate Box -->
+        <div class="p-5 rounded-3xl bg-purple-50/60 border-2 border-purple-200 space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🏛️💸</span>
+            <h3 class="text-base font-bold text-purple-950">ทฤษฎีที่ 5: ประมูลแบ่งมรดก + เงินชดเชย (Knaster’s Bid)</h3>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            <b>เข้าใจง่าย:</b> เมื่อต้องแบ่งทรัพย์สินชิ้นใหญ่ที่มีมูลค่าต่างกันมาก (เช่น รถยนต์ 1 คัน กับนาฬิกา 1 เรือน ให้พี่น้อง 3 คน) คนที่ให้ราคารถสูงสุดจะได้รถไป แต่ต้อง <b>"ควักเงินสดจ่ายเข้ากองกลาง"</b> เพื่อนำไปแบ่งชดเชยให้น้องที่ไม่ได้รถ จนสุดท้ายทุกคนได้รับมูลค่าสุทธิ (ของ + เงินสด) สูงกว่า 1/3 ของที่ตัวเองประเมินไว้ทุกคน!
+          </p>
+          <div class="bg-white p-3 rounded-2xl border border-purple-200 text-xs space-y-1">
+            <div class="font-bold text-purple-900">📐 สูตรของ Bronisław Knaster (1946):</div>
+            <div>1. มอบชิ้น j ให้ผู้ที่ประมูลสูงสุด b*ⱼ = maxᵢ bᵢⱼ</div>
+            <div>2. คำนวณส่วนแบ่งพื้นฐาน Sᵢ = (∑ⱼ bᵢⱼ) / n</div>
+            <div>3. คำนวณโบนัสกองกลางส่วนเกิน Bonus = (∑ⱼ b*ⱼ - ∑ᵢ Sᵢ) / n</div>
+            <div>4. ยอดเงินสดสุทธิของคนที่ i = <b>(Sᵢ + Bonus) - (มูลค่าของที่ i ชนะประมูล)</b></div>
+          </div>
+        </div>
+
+        <!-- Shapley Cost Box -->
+        <div class="p-5 rounded-3xl bg-cyan-50/60 border-2 border-cyan-200 space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🚕📍</span>
+            <h3 class="text-base font-bold text-cyan-950">ทฤษฎีที่ 6: หารค่าแท็กซี่ตามระยะร่วม (Shapley Value)</h3>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            <b>เข้าใจง่าย:</b> ฟ้า (ระยะ 150฿), ภัทร (ระยะ 300฿), และภูมิ (ระยะ 450฿) นั่งแท็กซี่คันเดียวกันจ่ายรวม 450฿<br>
+            • <b>ช่วงที่ 1 (0–150฿ แรก):</b> นั่งมาด้วยกันทั้ง 3 คน &rarr; หาร 3 คนละ <b>50฿</b> (ฟ้าลงป้ายนี้ จ่ายแค่ 50฿!)<br>
+            • <b>ช่วงที่ 2 (150–300฿ ถัดมา):</b> เหลือภัทรกับภูมินั่งต่อ 2 คน (150฿ ÷ 2) &rarr; บวกเพิ่มคนละ 75฿ (ภัทรลงป้ายนี้ รวมจ่าย 50+75 = <b>125฿</b>)<br>
+            • <b>ช่วงที่ 3 (300–450฿ สุดท้าย):</b> ภูมินั่งต่อคนเดียวอีก 150฿ &rarr; ภูมิจ่ายรวม 50+75+150 = <b>275฿</b> (รวมสามคน 50+125+275 = 450฿ เป๊ะ!)
+          </p>
+          <div class="bg-white p-3 rounded-2xl border border-cyan-200 text-xs space-y-1">
+            <div class="font-bold text-cyan-900">📐 สูตร Shapley Value (Airport / Taxi Game):</div>
+            <div>เรียงลำดับต้นทุนเดี่ยว c₁ ≤ c₂ ≤ ... ≤ cₙ แล้วคำนวณยอดจ่ายของคนที่ i จาก:</div>
+            <div class="font-mono font-bold text-cyan-800">Pay(i) = ∑_{k=1..i} [ (cₖ - cₖ₋₁) / (n - k + 1) ]</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-slate-400 pt-4 pb-8">
+      จัดทำโดยระบบ <b>FairShare Cozy Suite</b> • พัฒนาด้วยทฤษฎี Fair Division & Google Apps Script / GitHub Pages PWA
+    </footer>
+
+  </main>
+</body>
+</html>

@@ -1,7 +1,9 @@
-const CACHE_NAME = 'fairshare-pwa-v3';
+const CACHE_NAME = 'fairshare-pwa-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  './guide.html',
+  './FairShare_Guide.pdf',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'

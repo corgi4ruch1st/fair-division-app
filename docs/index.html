@@ -125,6 +125,12 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
+        <!-- ปุ่มเปิดคู่มือภาพประกอบ & ดาวน์โหลด PDF -->
+        <a href="./guide.html"
+           class="cozy-btn inline-flex items-center gap-1.5 text-xs font-semibold bg-emerald-500 hover:bg-emerald-600 text-white border-2 border-emerald-600 px-3 py-2 cursor-pointer">
+          <span>📘 คู่มือ & PDF</span>
+        </a>
+
         <!-- ปุ่มสลับธีม Cozy Cartoon <-> Modern Clean -->
         <button onclick="toggleThemeStyle()" id="themeToggleBtn"
                 class="cozy-btn inline-flex items-center gap-1.5 text-xs font-medium bg-white/90 hover:bg-white text-slate-700 border-2 border-purple-200 px-3 py-2 cursor-pointer">
@@ -1875,38 +1881,125 @@ function renderResultTab(s) {
 }
 
 // =========================================================================
-// TAB 3: THEORY GUIDE
+// TAB 3: ILLUSTRATED USER MANUAL & THEORY GUIDE + PDF DOWNLOAD
 // =========================================================================
 function renderTheoryTab() {
-  return `<div class="bento-card p-6 space-y-5 text-sm text-slate-700 leading-relaxed">
-    <div>
-      <h3 class="text-lg font-bold text-slate-900 font-cute">📖 คู่มือทฤษฎีความยุติธรรมทั้ง 6 โหมด</h3>
-      <p class="text-xs text-slate-500">เบื้องหลังคณิตศาสตร์ที่ช่วยให้เพื่อนและครอบครัวไม่ต้องเถียงกัน</p>
+  return `<div class="space-y-5">
+    <!-- Top Banner: Download PDF or Open Full Page Printable Manual -->
+    <div class="bento-card p-6 bg-gradient-to-r from-amber-50 via-white to-violet-50 border-2 border-amber-300">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="max-w-xl">
+          <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-200 text-amber-950 text-xs font-bold mb-2">
+            <span>📘 คู่มือฉบับภาพการ์ตูน + เอกสาร PDF</span>
+          </div>
+          <h3 class="text-lg sm:text-xl font-bold text-slate-900 font-cute">
+            คู่มือการใช้งาน & สารานุกรมทฤษฎี Fair Division ครบทั้ง 6 โหมด
+          </h3>
+          <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+            สามารถอ่านบนหน้าเว็บนี้ได้ทันที หรือกดดาวน์โหลดเป็นไฟล์ <b>PDF ขนาด A4 สีสันสดใส</b> สำหรับเก็บไว้อ่านออฟไลน์และส่งต่อให้เพื่อนๆ ในกลุ่มได้เลยครับ!
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2.5">
+          <a href="./FairShare_Guide.pdf" download="FairShare_Manual_and_Theory_Guide.pdf"
+             class="cozy-btn inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold cursor-pointer">
+            <span>📥 ดาวน์โหลดคู่มือ PDF</span>
+          </a>
+          <a href="./guide.html" target="_blank"
+             class="cozy-btn inline-flex items-center gap-1.5 px-4 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold cursor-pointer">
+            <span>🖨️ เปิดหน้าคู่มือฉบับเต็ม / พิมพ์ PDF</span>
+          </a>
+        </div>
+      </div>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div class="p-4 rounded-2xl bg-violet-50/70 border-2 border-violet-200">
-        <div class="font-bold text-violet-950 font-cute mb-1">🎁 1. แบ่งสิ่งของเป็นชิ้น (Indivisible Goods)</div>
-        <p class="text-xs text-slate-600">ใช้ <b>Maximum Nash Welfare (MNW)</b>, <b>Leximin</b> และ <b>Adjusted Winner</b> เพื่อให้ทุกคนได้ของที่ตัวเองชอบที่สุดและปราศจากความอิจฉา (EF1)</p>
+
+    <!-- Step-by-Step Visual User Manual -->
+    <div class="bento-card p-6 space-y-4">
+      <h4 class="text-base font-bold text-slate-900 font-cute">🚀 วิธีใช้งานแอปพลิเคชันใน 4 ขั้นตอนง่ายๆ</h4>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
+        <div class="p-4 rounded-2xl bg-violet-50/70 border-2 border-violet-200">
+          <div class="w-7 h-7 rounded-xl bg-violet-600 text-white font-bold flex items-center justify-center mb-2 font-cute">1</div>
+          <div class="font-bold text-violet-950 text-sm mb-1 font-cute">เลือกโหมด & สร้างห้อง</div>
+          <p class="text-slate-600 leading-relaxed">กดปุ่ม <b>"+ สร้างห้องแบ่งสรรใหม่"</b> เลือกโหมดจาก 6 โหมด แล้วใส่รายชื่อเพื่อนและรายการที่จะแบ่ง</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-amber-50/70 border-2 border-amber-200">
+          <div class="w-7 h-7 rounded-xl bg-amber-500 text-white font-bold flex items-center justify-center mb-2 font-cute">2</div>
+          <div class="font-bold text-amber-950 text-sm mb-1 font-cute">หยอดคะแนนตามใจชอบ</div>
+          <p class="text-slate-600 leading-relaxed">เลือกชื่อตัวละครของคุณในแท็บที่ 2 แล้วเลื่อนแถบให้คะแนน มีปุ่ม <b>"🪄 ปรับให้ครบ 100 อัตโนมัติ"</b> ช่วยคิดเลขให้</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-pink-50/70 border-2 border-pink-200">
+          <div class="w-7 h-7 rounded-xl bg-pink-500 text-white font-bold flex items-center justify-center mb-2 font-cute">3</div>
+          <div class="font-bold text-pink-950 text-sm mb-1 font-cute">ส่งต่อมือถือแบบลับ 🙈</div>
+          <p class="text-slate-600 leading-relaxed">ถ้าใช้มือถือเครื่องเดียวกัน กดปุ่ม <b>"🙈 บันทึก & ส่งมือถือให้เพื่อน"</b> ระบบจะมีม่านบังคะแนนไม่ให้แอบดูกัน</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-emerald-50/70 border-2 border-emerald-200">
+          <div class="w-7 h-7 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center mb-2 font-cute">4</div>
+          <div class="font-bold text-emerald-950 text-sm mb-1 font-cute">แชร์ใบเสร็จเข้า LINE 🧾</div>
+          <p class="text-slate-600 leading-relaxed">ดูนิทานอธิบายความแฟร์ ตารางพิสูจน์ความไม่อิจฉา และกดปุ่ม <b>"🧾 สร้างใบเสร็จส่ง LINE"</b> ได้เลย!</p>
+        </div>
       </div>
-      <div class="p-4 rounded-2xl bg-pink-50/70 border-2 border-pink-200">
-        <div class="font-bold text-pink-950 font-cute mb-1">🍰 2. ตัดเค้ก / แบ่งสัดส่วน % (Cake-Cutting)</div>
-        <p class="text-xs text-slate-600">แบ่งเวลา งบประมาณ หรืออาหารเป็น % ด้วยดุลยภาพ <b>CEEI</b> ที่ทุกคนได้เกิน 1/N และไม่มีใครอิจฉาใครเลย 100%</p>
+    </div>
+
+    <!-- Illustrated 6 Pillars of Fair Division -->
+    <div class="bento-card p-6 space-y-5 text-sm text-slate-700 leading-relaxed">
+      <div>
+        <h3 class="text-lg font-bold text-slate-900 font-cute">📚 เจาะลึกทฤษฎีความยุติธรรมทั้ง 6 โหมด (ฉบับเข้าใจง่าย + สูตรคณิตศาสตร์)</h3>
+        <p class="text-xs text-slate-500">อธิบายทั้งหลักคิดในชีวิตประจำวันและสมการทางเศรษฐศาสตร์ที่อยู่เบื้องหลัง</p>
       </div>
-      <div class="p-4 rounded-2xl bg-amber-50/70 border-2 border-amber-200">
-        <div class="font-bold text-amber-950 font-cute mb-1">🧹 3. แบ่งภาระงาน / จัดเวร (Chores)</div>
-        <p class="text-xs text-slate-600">เกลี่ยงานบ้านให้คนที่เหนื่อยที่สุดรับภาระต่ำสุด (<b>Min-Max Burden</b>) และผ่านเกณฑ์ <b>EF1 for Chores</b></p>
-      </div>
-      <div class="p-4 rounded-2xl bg-emerald-50/70 border-2 border-emerald-200">
-        <div class="font-bold text-emerald-950 font-cute mb-1">🏠 4. หารค่าเช่าห้อง (Envy-Free Rent)</div>
-        <p class="text-xs text-slate-600">จับคู่ห้องที่สร้างความสุขรวมสูงสุด แล้วปรับราคาค่าเช่าแต่ละห้องให้ทุกคนประหยัดเงินเทียบกับราคาในใจเท่ากันเป๊ะ</p>
-      </div>
-      <div class="p-4 rounded-2xl bg-purple-50/70 border-2 border-purple-200">
-        <div class="font-bold text-purple-950 font-cute mb-1">🏛️ 5. แบ่งมรดก + เงินชดเชย (Knaster’s Bid)</div>
-        <p class="text-xs text-slate-600">คนให้ราคาสูงสุดได้ทรัพย์สินไป และจ่ายเงินเข้ากองกลางเพื่อชดเชยให้คนที่ไม่ได้ของ จนทุกคนได้มูลค่าสุทธิสูงกว่า 1/N เท่ากัน</p>
-      </div>
-      <div class="p-4 rounded-2xl bg-cyan-50/70 border-2 border-cyan-200">
-        <div class="font-bold text-cyan-950 font-cute mb-1">🚕 6. หารค่าแท็กซี่ / ค่าใช้จ่าย (Shapley Value)</div>
-        <p class="text-xs text-slate-600">ทฤษฎีรางวัลโนเบล แบ่งค่ารถตามช่วงทางที่นั่งร่วมกันจริงเป็นขั้นบันได ยุติธรรมทั้งคนลงใกล้และคนลงไกล</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-4 rounded-2xl bg-violet-50/70 border-2 border-violet-200 space-y-2">
+          <div class="font-bold text-violet-950 font-cute text-base">🎁 1. แบ่งสิ่งของเป็นชิ้น (Indivisible Goods)</div>
+          <p class="text-xs text-slate-600"><b>เข้าใจง่าย:</b> มอบสิ่งของแต่ละชิ้นให้คนที่รักและให้คุณค่ากับมันมากที่สุด โดยไม่ทิ้งให้ใครได้คะแนนน้อยเกินไป</p>
+          <div class="p-2.5 rounded-xl bg-white border border-violet-200 text-[11px] font-mono text-violet-900">
+            • <b>Maximum Nash Welfare:</b> max ∏ᵢ uᵢ(Aᵢ)<br>
+            • <b>EF1 Guarantee:</b> uᵢ(Aᵢ) ≥ uᵢ(Aⱼ \ {g})<br>
+            • <b>Adjusted Winner (2 คน):</b> u₁(A₁) = u₂(A₂)
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-pink-50/70 border-2 border-pink-200 space-y-2">
+          <div class="font-bold text-pink-950 font-cute text-base">🍰 2. ตัดเค้ก / แบ่งสัดส่วน % (Cake-Cutting)</div>
+          <p class="text-xs text-slate-600"><b>เข้าใจง่าย:</b> แบ่งเวลาใช้ห้อง งบประมาณ หรืออาหารเป็น % โดยให้คนที่ชอบส่วนไหนได้เปอร์เซ็นต์ส่วนนั้นมากขึ้น จนทุกคนได้เกิน 1/N</p>
+          <div class="p-2.5 rounded-xl bg-white border border-pink-200 text-[11px] font-mono text-pink-900">
+            • <b>Eisenberg–Gale CEEI:</b> max ∑ᵢ ln(∑ⱼ xᵢⱼ vᵢⱼ)<br>
+            • <b>Strict Envy-Free:</b> uᵢ(Xᵢ) ≥ uᵢ(Xₖ) ทุกคู่ 100%
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-amber-50/70 border-2 border-amber-200 space-y-2">
+          <div class="font-bold text-amber-950 font-cute text-base">🧹 3. แบ่งภาระงาน / จัดเวร (Chores Allocation)</div>
+          <p class="text-xs text-slate-600"><b>เข้าใจง่าย:</b> คะแนนคือ "ความเหนื่อย" ระบบจะปรับฐานความเหนื่อยรวมของทุกคนเป็น 100% แล้วจัดเวรให้คนที่เกลียดงานไหนเลี่ยงงานนั้นได้</p>
+          <div class="p-2.5 rounded-xl bg-white border border-amber-200 text-[11px] font-mono text-amber-900">
+            • <b>Min-Max Disutility:</b> min maxᵢ dᵢ(Aᵢ)<br>
+            • <b>EF1 for Chores:</b> dᵢ(Aᵢ \ {c}) ≤ dᵢ(Aⱼ)
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-emerald-50/70 border-2 border-emerald-200 space-y-2">
+          <div class="font-bold text-emerald-950 font-cute text-base">🏠 4. หารค่าเช่าห้อง (Envy-Free Rent Division)</div>
+          <p class="text-xs text-slate-600"><b>เข้าใจง่าย:</b> จับคู่ห้องที่สร้างความสุขรวมสูงสุด แล้วปรับราคาค่าเช่าห้องใหญ่-ห้องเล็กให้ทุกคนประหยัดเงินเทียบกับราคาในใจเท่าๆ กัน</p>
+          <div class="p-2.5 rounded-xl bg-white border border-emerald-200 text-[11px] font-mono text-emerald-900">
+            • <b>Max Welfare:</b> max ∑ᵢ vᵢ(π(i))<br>
+            • <b>Envy-Free Price:</b> vᵢ(π(i)) - p_π(i) ≥ vᵢ(π(j)) - p_π(j)
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-purple-50/70 border-2 border-purple-200 space-y-2">
+          <div class="font-bold text-purple-950 font-cute text-base">🏛️ 5. แบ่งมรดก + เงินชดเชย (Knaster’s Sealed-Bid)</div>
+          <p class="text-xs text-slate-600"><b>เข้าใจง่าย:</b> คนประเมินราคาสูงสุดได้ทรัพย์สินชิ้นนั้นไป และจ่ายเงินเข้ากองกลางเพื่อชดเชยให้พี่น้องคนอื่นจนทุกคนได้กำไรเกิน 1/N เท่ากัน</p>
+          <div class="p-2.5 rounded-xl bg-white border border-purple-200 text-[11px] font-mono text-purple-900">
+            • <b>Fair Share:</b> Sᵢ = Vᵢ / n + Surplus / n<br>
+            • <b>Cash Transfer:</b> NetCashᵢ = Sᵢ - WonItemsᵢ
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-cyan-50/70 border-2 border-cyan-200 space-y-2">
+          <div class="font-bold text-cyan-950 font-cute text-base">🚕 6. หารค่าแท็กซี่ / ค่าใช้จ่าย (Shapley Value)</div>
+          <p class="text-xs text-slate-600"><b>เข้าใจง่าย:</b> ทฤษฎีรางวัลโนเบล แบ่งค่ารถเป็นช่วงๆ ช่วงแรกที่นั่งด้วยกันหารทุกคน ส่วนระยะทางที่นั่งต่อไปจ่ายเฉพาะคนที่ยังนั่งอยู่</p>
+          <div class="p-2.5 rounded-xl bg-white border border-cyan-200 text-[11px] font-mono text-cyan-900">
+            • <b>Shapley Taxi Formula:</b><br>
+            Pay(i) = ∑_{k=1..i} [ (cₖ - cₖ₋₁) / (n - k + 1) ]
+          </div>
+        </div>
       </div>
     </div>
   </div>`;
