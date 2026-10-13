@@ -23,14 +23,6 @@
       --shadow-cozy: 0 10px 25px -5px rgba(180, 140, 100, 0.10), 0 4px 0px 0px #F3E8D2;
       --shadow-btn: 0 3px 0px 0px rgba(0, 0, 0, 0.12);
     }
-    body.theme-clean {
-      --bg-main: #f8fafc;
-      --bg-pattern: none;
-      --card-bg: #ffffff;
-      --card-border: #e2e8f0;
-      --shadow-cozy: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
-      --shadow-btn: none;
-    }
     body {
       font-family: 'Prompt', sans-serif;
       background-color: var(--bg-main);
@@ -38,7 +30,6 @@
       background-size: 40px 40px;
       background-position: 0 0, 20px 20px;
       color: #334155;
-      transition: background-color 0.25s ease;
     }
     h1, h2, h3, .font-cute {
       font-family: 'Mitr', 'Prompt', sans-serif;
@@ -46,11 +37,6 @@
     .cozy-header {
       background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 35%, #E9D5FF 75%, #C7D2FE 100%);
       border-bottom: 3px solid #FDE047;
-    }
-    body.theme-clean .cozy-header {
-      background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #4c1d95 100%);
-      border-bottom: none;
-      color: #ffffff;
     }
     .bento-card {
       background-color: var(--card-bg);
@@ -130,12 +116,6 @@
            class="cozy-btn inline-flex items-center gap-1.5 text-xs font-semibold bg-emerald-500 hover:bg-emerald-600 text-white border-2 border-emerald-600 px-3 py-2 cursor-pointer">
           <span>📘 คู่มือ & PDF</span>
         </a>
-
-        <!-- ปุ่มสลับธีม Cozy Cartoon <-> Modern Clean -->
-        <button onclick="toggleThemeStyle()" id="themeToggleBtn"
-                class="cozy-btn inline-flex items-center gap-1.5 text-xs font-medium bg-white/90 hover:bg-white text-slate-700 border-2 border-purple-200 px-3 py-2 cursor-pointer">
-          <span>🎨 ธีม: การ์ตูนพาสเทล</span>
-        </button>
 
         <!-- ปุ่มติดตั้งแอปลงเครื่อง (PWA Install) -->
         <button id="installAppBtn" onclick="handleInstallClick()"
@@ -402,22 +382,6 @@ function fireCozyConfetti() {
       origin: { y: 0.7 },
       colors: ['#FBBF24', '#A78BFA', '#34D399', '#F472B6', '#60A5FA']
     });
-  }
-}
-
-function toggleThemeStyle() {
-  const isClean = document.body.classList.toggle('theme-clean');
-  const btn = document.getElementById('themeToggleBtn');
-  const titleEl = document.getElementById('headerTitleText');
-  const subEl = document.getElementById('headerSubText');
-  if (isClean) {
-    btn.innerHTML = '<span>💼 ธีม: เรียบหรูทางการ</span>';
-    if (titleEl) titleEl.className = 'text-lg sm:text-xl font-semibold tracking-tight text-white';
-    if (subEl) subEl.className = 'text-[11px] sm:text-xs text-indigo-100';
-  } else {
-    btn.innerHTML = '<span>🎨 ธีม: การ์ตูนพาสเทล</span>';
-    if (titleEl) titleEl.className = 'text-lg sm:text-xl font-semibold tracking-tight text-slate-800';
-    if (subEl) subEl.className = 'text-[11px] sm:text-xs text-slate-600';
   }
 }
 
